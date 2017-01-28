@@ -1,0 +1,1 @@
+TRUNCATE typecho_meting;
