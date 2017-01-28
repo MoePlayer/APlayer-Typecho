@@ -135,8 +135,8 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $data=array();
         foreach($all[3] as $vo){
             $t=self::shortcode_parse_atts(htmlspecialchars_decode($vo));
-            if(!in_array($t['server'],['netease','tencent','xiami','baidu','kugou']))continue;
-            if(!in_array($t['type'],['search','album','playlist','artist','song']))continue;
+            if(!in_array($t['server'],array('netease','tencent','xiami','baidu','kugou')))continue;
+            if(!in_array($t['type'],array('search','album','playlist','artist','song')))continue;
             $data[]=$t;
         }
         $id=self::getPID();
