@@ -81,6 +81,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
     }
 
     private function js(){
+        self::filterReferer();
         $PID=$this->request->get('id');
         $data=$this->request->get('d');
         $data=json_decode(base64_decode($data),1);
@@ -136,6 +137,7 @@ var Meting{$PID} = new APlayer({
     }
 
     private function url(){
+        self::filterReferer();
         $id=$this->request->get('id');
         $site=$this->request->get('site');
         $rate=Typecho_Widget::widget('Widget_Options')->plugin('Meting')->bitrate;
@@ -152,6 +154,7 @@ var Meting{$PID} = new APlayer({
     }
 
     private function pic(){
+        self::filterReferer();
         $id=$this->request->get('id');
         $site=$this->request->get('site');
 
@@ -166,6 +169,7 @@ var Meting{$PID} = new APlayer({
     }
 
     private function lrc(){
+        self::filterReferer();
         $id=$this->request->get('id');
         $site=$this->request->get('site');
 
@@ -212,4 +216,7 @@ var Meting{$PID} = new APlayer({
         else return false;
     }
 
+    private function filterReferer(){
+        if(isset($_SERVER['HTTP_REFERER'])&&strpos($_SERVER['HTTP_REFERER'],$_SERVER['HTTP_HOST'])===false)die(403);
+    }
 }

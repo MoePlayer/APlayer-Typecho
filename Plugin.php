@@ -6,13 +6,13 @@ if(!defined('__TYPECHO_ROOT_DIR__'))exit;
  *
  * @package Meting
  * @author METO
- * @version 1.0.0
+ * @version 1.0.1
  * @dependence 13.12.12-*
  * @link https://github.com/metowolf/Meting
  *
  */
 
- define('METING_VERSION','1.0.0');
+ define('METING_VERSION','1.0.1');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
