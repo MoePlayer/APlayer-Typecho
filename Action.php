@@ -1,6 +1,6 @@
 <?php
 if(!defined('__TYPECHO_ROOT_DIR__'))exit;
-if (!extension_loaded('Meting'))include_once 'include/Meting.php';
+if(!extension_loaded('Meting'))include_once 'include/Meting.php';
 
 class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
 
@@ -25,6 +25,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             if(strpos($url,'163.com')!==false){
                 $server='netease';
                 if(preg_match('/playlist\?id=(\d+)/i',$url,$id))list($id,$type)=array($id[1],'playlist');
+                elseif(preg_match('/toplist\?id=(\d+)/i',$url,$id))list($id,$type)=array($id[1],'playlist');
                 elseif(preg_match('/album\?id=(\d+)/i',$url,$id))list($id,$type)=array($id[1],'album');
                 elseif(preg_match('/song\?id=(\d+)/i',$url,$id))list($id,$type)=array($id[1],'song');
                 elseif(preg_match('/artist\?id=(\d+)/i',$url,$id))list($id,$type)=array($id[1],'artist');
@@ -142,7 +143,7 @@ var Meting{$PID} = new APlayer({
         $site=$this->request->get('site');
         $rate=Typecho_Widget::widget('Widget_Options')->plugin('Meting')->bitrate;
 
-        $cachekey="url/{$site}/{$id}";
+        $cachekey="url/{$site}/{$id}/{$rate}";
         $data=self::cacheRead($cachekey,60*15);
         if(!$data){
             $data=(new Meting($site))->url($id,$rate);
@@ -207,7 +208,7 @@ var Meting{$PID} = new APlayer({
         $result = $db->fetchAll($query);
         if(sizeof($result)){
             if(time()-$result[0]['date']>$t){
-                $delete = $db->delete('value','date')->from($prefix.'meting')->where('date<?',time()-$t);
+                $delete=$db->delete($prefix.'meting')->where('date<?',time()-$t);
                 $db->query($delete);
                 return false;
             }

@@ -2,17 +2,17 @@
 if(!defined('__TYPECHO_ROOT_DIR__'))exit;
 
 /**
- * Meting for Typecho
+ * Meting for Typecho | 在 Typecho 中使用 APlayer 播放在线音乐吧～
  *
  * @package Meting
  * @author METO
- * @version 1.0.1
+ * @version 1.0.2
  * @dependence 13.12.12-*
  * @link https://github.com/metowolf/Meting
  *
  */
 
- define('METING_VERSION','1.0.1');
+ define('METING_VERSION','1.0.2');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -58,9 +58,9 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
      */
     public static function config(Typecho_Widget_Helper_Form $form){
         $t = new Typecho_Widget_Helper_Form_Element_Text(
-            'theme', null, '#e9e9e9',
+            'theme', null, '#ad7a86',
             _t('播放器颜色'),
-            _t('播放器默认的主题颜色，支持如 #372e21、#75c、red，该设定会被[Meting]标签中的theme属性覆盖，默认为 #e9e9e9'));
+            _t('播放器默认的主题颜色，支持如 #372e21、#75c、red，该设定会被[Meting]标签中的theme属性覆盖，默认为 #ad7a86'));
         $form->addInput($t);
         $t = new Typecho_Widget_Helper_Form_Element_Text(
             'height', null, '340px',
@@ -102,7 +102,12 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
      */
     public static function header(){
         $dir=Helper::options()->pluginUrl.'/Meting/assets/';
-        echo "<!-- Meting ".METING_VERSION." Start -->\n<script type=\"text/javascript\" src=\"{$dir}APlayer.min.js\"></script>\n<!-- Meting End -->";
+        $ver=METING_VERSION;
+        echo <<<EOF
+    <!-- Meting Start -->
+    <script type="text/javascript" src="{$dir}APlayer.min.js?v={$ver}"></script>
+    <!-- Meting End -->
+EOF;
     }
 
     public static function footer(){}
@@ -154,7 +159,7 @@ EOF;
         echo <<<EOF
 <script type="text/javascript">
 $(function() {
-	if($('#wmd-button-row').length>0)$('#wmd-button-row').append('<li class="wmd-spacer wmd-spacer1" id="wmd-spacer5"></li><li class="wmd-button" id="wmd-music-button" style="" title="插入音乐">音乐</li>');
+	if($('#wmd-button-row').length>0)$('#wmd-button-row').append('<li class="wmd-spacer wmd-spacer1" id="wmd-spacer5"></li><li class="wmd-button" id="wmd-music-button" style="" title="插入音乐"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAABBVBMVEUAAADS1NVVVVVKS0pWVldZWVpJSkrHyctlZmaxs7RlZmZgYWFfX1/GyMrLzc7P0dJiY2PO0NJaWlqWmJpYV1dVVVXQ09TIystJSkpXV1fMzs9QUFCYmpxVVla3ubmoqqqdnp+jpaaSlJZqamtmZmbP0dLCxMbBw8TLzc65vL1VV1dSU1PBw8XFx8nR09SOkJKipaeho6RjZWW7vL2ys7SusLHGyMpZWVp4eHisrrBqamrCxMapq6yusLJ5enrP0tNtbm+ipafGyMpJSkqmp6iZmptXV1dZWVnJy8zS1NWmqKrLzc7R09TFx8m3ubuqrK6hpKWcnqCVlpeXmZuSk5SDhIWDg4QW1XxpAAAATXRSTlMABEgFAvxPFv79+vrGsrGurpKNaFlOTTQ0MyMc/v367e3p6OPizczMyLetrKeemYSDg4F/fn59fXt5eW5ubGtpZ2BdTEI+NzYrKBYMC1kKAkAAAAC1SURBVBjTRY7VEoMwEEWh7sUKFOru7u6OVv7/U7oh7bAPOblnktlL/IYkMfE8eDoSofn7P1+jKfP9efnDF5ylipFnOI4pmGXJ+t1Kh87oEg9lmiRQKB5k/FQ+lgTAOmovaMzhGPQJpwsll5OYdoGzFVsTkRDr7GYMnGR1tweJfTKR6wGHioaFw/3U28CRogaxCBp6B7hT1EDMEgFN2wK9YdWHhc9fvRHILKmT1ZRaeHEduwfMF0K7E1YSv1vLAAAAAElFTkSuQmCC"/></li>');
 	$(document).on('click', '#wmd-music-button', function() {
         $('body').append(
             '<div id="MetingPanel">'+
@@ -286,7 +291,6 @@ EOF;
 			}
         }catch(Typecho_Db_Exception $e){
             $code=$e->getCode();
-            if($code=='42S01')return;
             throw new Typecho_Plugin_Exception('数据表清空失败，插件禁用失败。错误号: '.$code);
         }
     }
