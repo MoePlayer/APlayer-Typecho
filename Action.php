@@ -174,21 +174,14 @@ var Meting{$PID} = new APlayer({
         $id=$this->request->get('id');
         $site=$this->request->get('site');
 
-        $cachekey="lrc/{$site}/{$id}";
+        $cachekey="lyric/{$site}/{$id}";
         $data=self::cacheRead($cachekey,60*60*24*10);
         if(!$data){
-            $data=(new Meting($site))->lyric($id);
+            $data=(new Meting($site))->format(true)->lyric($id);
             $data=json_decode($data,1);
             self::cacheWrite($cachekey,$data);
         }
-
-        switch($site){
-            case 'netease':$text=$data['lrc']['lyric'];break;
-            case 'tencent':$text=base64_decode($data['lyric']);break;
-            case 'xiami':$text=$data['lyric'];break;
-            case 'kugou':$text=$data['lyric'];break;
-            case 'baidu':$text=$data['lrcContent'];break;
-        }
+        $text=$data['lyric'];
         if(strlen($text)==0)$text='[00:00.00]无歌词';
         echo $text;
     }
