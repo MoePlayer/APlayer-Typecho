@@ -7,7 +7,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
     public function execute(){}
 
     public function action(){
-        $this->on($this->request->is('do=js'))->js();
+        $this->on($this->request->is('do=musicjs'))->musicjs();
         $this->on($this->request->is('do=url'))->url();
         $this->on($this->request->is('do=pic'))->pic();
         $this->on($this->request->is('do=lrc'))->lrc();
@@ -43,7 +43,6 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
                 elseif(preg_match('/album\/([^\.]*)/i',$url,$id))list($id,$type)=array($id[1],'album');
                 elseif(preg_match('/song\/([^\.]*)/i',$url,$id))list($id,$type)=array($id[1],'song');
                 elseif(preg_match('/artist\/([^\.]*)/i',$url,$id))list($id,$type)=array($id[1],'artist');
-
                 if(!preg_match('/^\d*$/i',$id,$t)){
                     $data=self::curl($url);
                     preg_match('/'.$type.'\/(\d+)/i',$data,$id);
@@ -81,7 +80,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
         return $result;
     }
 
-    private function js(){
+    private function musicjs(){
         self::filterReferer();
         $PID=$this->request->get('id');
         $data=$this->request->get('d');
@@ -122,19 +121,19 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
         $player['music']=json_encode($player['music']);
 
         header('content-type:application/javascript');
-        echo"
-var Meting{$PID} = new APlayer({
-    element: document.getElementById('MetingPlayer'+{$PID}),
-    autoplay: ".$player['autoplay'].",
-    preload: \"".$player['preload']."\",
-    showlrc: 3,
-    mutex: true,
-    mode: '".$player['mode']."',
-    theme: \"".$player['theme']."\",
-    music: ".$player['music'].",
-    listmaxheight: '".$player['height']."',
-});
-";
+        echo "
+            var Meting{$PID} = new APlayer({
+                element: document.getElementById('MetingPlayer'+{$PID}),
+                autoplay: ".$player['autoplay'].",
+                preload: \"".$player['preload']."\",
+                showlrc: 3,
+                mutex: true,
+                mode: '".$player['mode']."',
+                theme: \"".$player['theme']."\",
+                music: ".$player['music'].",
+                listmaxheight: '".$player['height']."',
+            });
+            ";
     }
 
     private function url(){
@@ -181,9 +180,26 @@ var Meting{$PID} = new APlayer({
             $data=json_decode($data,1);
             self::cacheWrite($cachekey,$data);
         }
-        $text=$data['lyric'];
+        if(!empty($data['tlyric']))$text=$this->lrctran($data['lyric'],$data['tlyric']);
+        else $text=$data['lyric'];
         if(strlen($text)==0)$text='[00:00.00]无歌词';
         echo $text;
+    }
+
+    private function lrctran($lyric,$tlyric){
+        preg_match_all('/\[(\d{2}:\d{2}\.\d+)\]([^\n]+)/i',$lyric,$t1);
+        preg_match_all('/\[(\d{2}:\d{2}\.\d+)\]([^\n]+)/i',$tlyric,$t2);
+        $from=$to=$t1[0];
+        $len=sizeof($t1[0]);
+        for($i=0,$j=0;$i<$len;$i++){
+            while($t1[1][$i]>$t2[1][$j]&&$j+1<$len)$j++;
+            if($t1[1][$i]==$t2[1][$j]){
+                $t=trim(str_replace('/','',$t2[2][$j]));
+                if($t)$to[$i].=" (".$t2[2][$j].")";
+                $j++;
+            }
+        }
+        return str_replace($from,$to,$lyric);
     }
 
     private function cacheWrite($k,$v){
