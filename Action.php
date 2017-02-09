@@ -190,9 +190,10 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
         preg_match_all('/\[(\d{2}:\d{2}\.\d+)\]([^\n]+)/i',$lyric,$t1);
         preg_match_all('/\[(\d{2}:\d{2}\.\d+)\]([^\n]+)/i',$tlyric,$t2);
         $from=$to=$t1[0];
-        $len=sizeof($t1[0]);
-        for($i=0,$j=0;$i<$len;$i++){
-            while($t1[1][$i]>$t2[1][$j]&&$j+1<$len)$j++;
+        $len1=sizeof($t1[0]);
+        $len2=sizeof($t2[0]);
+        for($i=0,$j=0;$i<$len1;$i++){
+            while($t1[1][$i]>$t2[1][$j]&&$j+1<$len2)$j++;
             if($t1[1][$i]==$t2[1][$j]){
                 $t=trim(str_replace('/','',$t2[2][$j]));
                 if($t)$to[$i].=" (".$t2[2][$j].")";
