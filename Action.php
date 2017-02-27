@@ -62,6 +62,10 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
                 elseif(preg_match('/song\/(\d+)/i',$url,$id))list($id,$type)=array($id[1],'song');
                 elseif(preg_match('/artist\/(\d+)/i',$url,$id))list($id,$type)=array($id[1],'artist');
             }
+            elseif(strpos($url,'kuwo.cn')!==false){
+                $server='kuwo';
+                if(preg_match('/yinyue\/(\d+)/i',$url,$id))list($id,$type)=array('MUSIC_'.$id[1],'song');
+            }
             else list($id,$type)=array($url,'search');
             echo '[Music server="'.$server.'" id="'.$id.'" type="'.$type.'"/]'."\n";
         }
@@ -214,8 +218,8 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
     private function cacheRead($k,$t=60*60){
         $db=Typecho_Db::get();
         $prefix=$db->getPrefix();
-        $query= $db->select('value','date')->from($prefix.'meting')->where('id=?',sha1($k));
-        $result = $db->fetchAll($query);
+        $query=$db->select('value','date')->from($prefix.'meting')->where('id=?',sha1($k));
+        $result=$db->fetchAll($query);
         if(sizeof($result)){
             if(time()-$result[0]['date']>$t){
                 $delete=$db->delete($prefix.'meting')->where('date<?',time()-$t);
@@ -228,6 +232,9 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
     }
 
     private function filterReferer(){
-        if(isset($_SERVER['HTTP_REFERER'])&&strpos($_SERVER['HTTP_REFERER'],$_SERVER['HTTP_HOST'])===false)die(403);
+        if(isset($_SERVER['HTTP_REFERER'])&&strpos($_SERVER['HTTP_REFERER'],$_SERVER['HTTP_HOST'])===false){
+            http_response_code(403);
+            die();
+        }
     }
 }

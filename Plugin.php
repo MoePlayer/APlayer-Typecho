@@ -6,13 +6,13 @@ if(!defined('__TYPECHO_ROOT_DIR__'))exit;
  *
  * @package Meting
  * @author METO
- * @version 1.0.3
- * @dependence 13.12.12-*
- * @link https://github.com/metowolf/Meting
+ * @version 1.0.4
+ * @dependence 14.10.10-*
+ * @link https://github.com/metowolf/Meting-Typecho-Plugin
  *
  */
 
-define('METING_VERSION','1.0.3');
+define('METING_VERSION','1.0.4');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -27,7 +27,6 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
     public static function activate(){
         Meting_Plugin::install();
         Helper::addRoute("Meting_Route","/MetingAPI","Meting_Action",'action');
-        Typecho_Plugin::factory('Widget_Abstract_Contents')->filter   =array('Meting_Plugin','playerFilter');
         Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx=array('Meting_Plugin','playerReplace');
         Typecho_Plugin::factory('Widget_Abstract_Contents')->excerptEx=array('Meting_Plugin','playerReplace');
         Typecho_Plugin::factory('Widget_Archive')->header=array('Meting_Plugin','header');
@@ -91,8 +90,6 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 
     public static function personalConfig(Typecho_Widget_Helper_Form $form){}
 
-    public static function render(){}
-
     /**
      * 获取插件配置面板
      *
@@ -114,12 +111,8 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         return ++self::$PID;
     }
 
-    public static function playerFilter($data){
-        return $data;
-    }
-
     public static function playerReplace($data,$widget,$last){
-        $text=$last?:$data;
+        $text=empty($last)?$data:$last;
         if($widget instanceof Widget_Archive){
             $data=$text;
             $pattern=self::get_shortcode_regex(array('Meting'));
@@ -142,7 +135,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $data=array();
         foreach($matches as $vo){
             $t=self::shortcode_parse_atts(htmlspecialchars_decode($vo));
-            if(!in_array($t['server'],array('netease','tencent','xiami','baidu','kugou')))continue;
+            if(!in_array($t['server'],array('netease','tencent','xiami','baidu','kugou','kuwo')))continue;
             if(!in_array($t['type'],array('search','album','playlist','artist','song')))continue;
             $data[]=$t;
         }
@@ -212,7 +205,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 			}
         }catch(Typecho_Db_Exception $e){
             $code=$e->getCode();
-            if($code=='42S01')return;
+            if($code=='42S01'||$code==1050)return;
             throw new Typecho_Plugin_Exception('数据表建立失败，插件启用失败。错误号: '.$code);
         }
     }

@@ -1,1 +1,1 @@
-TRUNCATE typecho_meting;
+DROP TABLE typecho_meting;
