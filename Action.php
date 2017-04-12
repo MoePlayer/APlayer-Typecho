@@ -96,7 +96,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             $EID=md5('js/'.$vo['server'].'/'.$vo['type'].'/'.$vo['id']);
             $t=self::cacheRead($EID,60*60*24*3);
             if(!$t){
-                $API=(new Meting($vo['server']))->format(true);
+                $API=(new \Metowolf\Meting($vo['server']))->format(true);
                 $t=call_user_func_array(array($API,$vo['type']),array($vo['id']));
                 $t=json_decode($t,1);
                 self::cacheWrite($EID,$t);
@@ -149,11 +149,11 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
         $cachekey="url/{$site}/{$id}/{$rate}";
         $data=self::cacheRead($cachekey,60*15);
         if(!$data){
-            $data=(new Meting($site))->url($id,$rate);
+            $data=(new \Metowolf\Meting($site))->format()->url($id,$rate);
             $data=json_decode($data,1);
             self::cacheWrite($cachekey,$data);
         }
-        if(empty($data['url']))$data['url']='https://oc1pe0tot.qnssl.com/copyright.m4a';
+        if(empty($data['url']))$data['url']="https://api.i-meto.com/music/copyright?s={$site}id={$id}";
         $this->response->redirect($data['url']);
     }
 
@@ -165,7 +165,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
         $cachekey="pic/{$site}/{$id}";
         $data=self::cacheRead($cachekey,60*60*24*30);
         if(!$data){
-            $data=(new Meting($site))->pic($id,90);
+            $data=(new \Metowolf\Meting($site))->pic($id,90);
             $data=json_decode($data,1);
             self::cacheWrite($cachekey,$data);
         }
@@ -180,7 +180,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
         $cachekey="lyric/{$site}/{$id}";
         $data=self::cacheRead($cachekey,60*60*24*10);
         if(!$data){
-            $data=(new Meting($site))->format(true)->lyric($id);
+            $data=(new \Metowolf\Meting($site))->format(true)->lyric($id);
             $data=json_decode($data,1);
             self::cacheWrite($cachekey,$data);
         }
@@ -208,25 +208,24 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
     }
 
     private function cacheWrite($k,$v){
-        if(!is_array($v))return;
+        if(!is_array($v)||is_null($v))return;
         $db=Typecho_Db::get();
-        $prefix=$db->getPrefix();
-        $insert=$db->insert($prefix.'meting')->rows(array('id'=>sha1($k),'value'=>serialize($v),'date'=>time()));
+        $insert=$db->insert('table.metingv1')->rows(array('id'=>md5($k),'value'=>serialize($v),'last'=>time()));
         return $db->query($insert);
     }
 
     private function cacheRead($k,$t=60*60){
         $db=Typecho_Db::get();
-        $prefix=$db->getPrefix();
-        $query=$db->select('value','date')->from($prefix.'meting')->where('id=?',sha1($k));
-        $result=$db->fetchAll($query);
-        if(sizeof($result)){
-            if(time()-$result[0]['date']>$t){
-                $delete=$db->delete($prefix.'meting')->where('date<?',time()-$t);
+        $query=$db->select('value','last')->from('table.metingv1')->where('id=?',md5($k));
+        $result=$db->fetchRow($query);
+
+        if(isset($result['value'])){
+            if(time()-$result['last']>$t){
+                $delete=$db->delete('table.metingv1')->where('last<?',time()-$t);
                 $db->query($delete);
                 return false;
             }
-            return unserialize($result[0]['value']);
+            return unserialize($result['value']);
         }
         else return false;
     }
