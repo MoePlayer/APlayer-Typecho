@@ -1,12 +1,16 @@
+![](http://ww2.sinaimg.cn/large/a15b4afegw1fbg1l7wn09j20fw05gq34)
+
 # Meting for Typecho
 在 Typecho 中使用 APlayer 播放在线音乐吧～  
-[在线演示](http://demo.i-meto.com)
+[发布页面](https://i-meto.com/meting-typecho/)  
+[在线演示](https://demo.i-meto.com)
 
 ## 介绍
  1. 支持国内五大音乐平台（网易云、QQ、虾米、百度、酷狗）的单曲/专辑/歌单播放
  2. 简单快捷，复制音乐详情页面网址，后台自动生成播放代码
  3. **支持不同音乐平台歌曲混合播放**
  4. 前端 Aplayer，后端 Meting 及时更新，保证兼容性及 API 高可用性
+ 5. 支持 MySql、SQLite 数据库
 
 ## 声明
 本作品仅供个人学习研究使用，请勿将其用作商业用途。  

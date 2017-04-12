@@ -6,13 +6,13 @@ if(!defined('__TYPECHO_ROOT_DIR__'))exit;
  *
  * @package Meting
  * @author METO
- * @version 1.0.5
+ * @version 1.1.0
  * @dependence 14.10.10-*
  * @link https://github.com/metowolf/Meting-Typecho-Plugin
  *
  */
 
-define('METING_VERSION','1.0.5');
+define('METING_VERSION','1.1.0');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -192,40 +192,27 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 
     public static function install(){
         $db=Typecho_Db::get();
-        $prefix=$db->getPrefix();
-        $scripts=file_get_contents(__DIR__.'/include/install.sql');
-		$scripts=str_replace('typecho_',$prefix,$scripts);
-		$scripts=explode(';', $scripts);
+        $dbname=$db->getPrefix().'metingv1';
         try{
-            foreach($scripts as $script){
-				$script=trim($script);
-				if($script){
-					$db->query($script,Typecho_Db::WRITE);
-				}
-			}
+            $db->query("CREATE TABLE IF NOT EXISTS {$dbname} (
+                        id CHAR(32) PRIMARY KEY     NOT NULL UNIQUE,
+                        value               TEXT    NOT NULL,
+                        last                int     NOT NULL
+                    )");
         }catch(Typecho_Db_Exception $e){
             $code=$e->getCode();
-            if($code=='42S01'||$code==1050)return;
-            throw new Typecho_Plugin_Exception('数据表建立失败，插件启用失败。错误号: '.$code);
+            throw new Typecho_Plugin_Exception('插件启用失败。错误号：'.$code);
         }
     }
 
     public static function uninstall(){
         $db=Typecho_Db::get();
-        $prefix=$db->getPrefix();
-        $scripts=file_get_contents(__DIR__.'/include/uninstall.sql');
-		$scripts=str_replace('typecho_',$prefix,$scripts);
-		$scripts=explode(';', $scripts);
+        $dbname=$db->getPrefix().'metingv1';
         try{
-            foreach($scripts as $script){
-				$script=trim($script);
-				if($script){
-					$db->query($script,Typecho_Db::WRITE);
-				}
-			}
+            $db->query("DROP TABLE IF EXISTS {$dbname};");
         }catch(Typecho_Db_Exception $e){
             $code=$e->getCode();
-            throw new Typecho_Plugin_Exception('数据表清空失败，插件禁用失败。错误号: '.$code);
+            throw new Typecho_Plugin_Exception('插件禁用失败。错误号：'.$code);
         }
     }
 }
