@@ -2,7 +2,7 @@
 /*!
  * Meting music framework
  * https://i-meto.com
- * Version 1.3.2.1
+ * Version 1.3.4
  *
  * Copyright 2017, METO Sheel <i@i-meto.com>
  * Released under the MIT license
@@ -173,15 +173,17 @@ class Meting
             case 'kugou':
                 $API=array(
                     'method' => 'GET',
-                    'url'    => 'http://mobilecdn.kugou.com/api/v3/search/song',
+                    'url'    => 'http://ioscdn.kugou.com/api/v3/search/song',
                     'body'   => array(
                         'iscorrect' => 1,
                         'pagesize'  => $limit,
-                        'plat'      => 20,
-                        'sver'      => 3,
-                        'showtype'  => 14,
+                        'plat'      => 2,
+                        'tag'       => 1,
+                        'sver'      => 5,
+                        'showtype'  => 10,
                         'page'      => $page,
                         'keyword'   => $keyword,
+                        'version'   => 8550
                     ),
                     'format' => 'data#info',
                 );
@@ -337,7 +339,7 @@ class Meting
                         'plat'     => 2,
                         'page'     => 1,
                         'pagesize' => -1,
-                        'version'  => 8400,
+                        'version'  => 8550,
                     ),
                     'format' => 'data#info',
                 );
@@ -817,13 +819,13 @@ class Meting
         $data=json_decode($result, 1);
         if($data['data'][0]['uf'] != null) {
             $url=array(
-                'url' => str_replace('http:', 'https:', $data['data'][0]['uf']['url']),
+                'url' => str_replace('http://m8', 'https://m8', $data['data'][0]['uf']['url']),
                 'br'  =>$data['data'][0]['uf']['br']/1000,
             );
         }
         else{
             $url=array(
-                'url' => str_replace('http:', 'https:', $data['data'][0]['url']),
+                'url' => str_replace('http://m8', 'https://m8', $data['data'][0]['url']),
                 'br'  => $data['data'][0]['br']/1000,
             );
         }
