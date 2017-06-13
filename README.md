@@ -1,4 +1,4 @@
-![](https://wx2.sinaimg.cn/large/a15b4afegw1fbg1l7wn09j20fw05gq34)
+![](http://ww2.sinaimg.cn/large/a15b4afegw1fbg1l7wn09j20fw05gq34)
 
 # Meting for Typecho
 在 Typecho 中使用 APlayer 播放在线音乐吧～  

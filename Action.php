@@ -62,10 +62,6 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
                 elseif(preg_match('/song\/(\d+)/i',$url,$id))list($id,$type)=array($id[1],'song');
                 elseif(preg_match('/artist\/(\d+)/i',$url,$id))list($id,$type)=array($id[1],'artist');
             }
-            elseif(strpos($url,'kuwo.cn')!==false){
-                $server='kuwo';
-                if(preg_match('/yinyue\/(\d+)/i',$url,$id))list($id,$type)=array('MUSIC_'.$id[1],'song');
-            }
             else list($id,$type)=array($url,'search');
             echo '[Music server="'.$server.'" id="'.$id.'" type="'.$type.'"/]'."\n";
         }
