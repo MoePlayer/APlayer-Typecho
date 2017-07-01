@@ -3,7 +3,7 @@
  * Meting music framework
  * https://i-meto.com
  * https://github.com/metowolf/Meting
- * Version 1.3.5.1
+ * Version 1.3.6.1
  *
  * Copyright 2017, METO Sheel <i@i-meto.com>
  * Released under the MIT license
@@ -869,7 +869,7 @@ class Meting
         foreach ($type as $key=>$vo) {
             if ($data['data'][0]['file'][$key]&&$vo[0]<=$this->_TEMP['br']) {
                 $url=array(
-                    'url' => 'http://dl.stream.qqmusic.qq.com/'.$vo[1].$data['data'][0]['file']['media_mid'].'.'.$vo[2].'?vkey='.$KEY.'&guid='.$GUID.'&uid=0&fromtag=30',
+                    'url' => 'https://dl.stream.qqmusic.qq.com/'.$vo[1].$data['data'][0]['file']['media_mid'].'.'.$vo[2].'?vkey='.$KEY.'&guid='.$GUID.'&uid=0&fromtag=30',
                     'br'  => $vo[0],
                 );
                 break;
@@ -886,7 +886,7 @@ class Meting
     private function xiami_url($result)
     {
         $data=json_decode($result, 1);
-        if (isset($data['location'])) {
+        if (!empty($data['location'])) {
             $location = $data['location'];
             $num = (int)$location[0];
             $str = substr($location, 1);
@@ -910,7 +910,7 @@ class Meting
             }
             $urlt=str_replace('^', '0', urldecode($urlt));
             $url=array(
-              'url' => urldecode($urlt),
+              'url' => str_replace('http://','https://',urldecode($urlt)),
               'br'  => 320,
             );
         } else {
@@ -1017,10 +1017,23 @@ class Meting
             $data=$this->curl($API);
             $data=preg_replace('/<[^>]+>/', '', $data);
         }
-        $arr=array(
-            'lyric'  => $data,
-            'tlyric' => '',
-        );
+        preg_match_all('/\[([\d:\.]+)\](.*)\s\[x-trans\](.*)/i',$data,$match);
+        if(sizeof($match[0])){
+            for($i=0;$i<sizeof($match[0]);$i++){
+                $A[]='['.$match[1][$i].']'.$match[2][$i];
+                $B[]='['.$match[1][$i].']'.$match[3][$i];
+            }
+            $arr=array(
+                'lyric'  => str_replace($match[0],$A,$data),
+                'tlyric' => str_replace($match[0],$B,$data),
+            );
+        }
+        else{
+            $arr=array(
+                'lyric'  => $data,
+                'tlyric' => '',
+            );
+        }
         return json_encode($arr);
     }
     private function kugou_lyric($result)
@@ -1056,6 +1069,7 @@ class Meting
             'id'        => $data['id'],
             'name'      => $data['name'],
             'artist'    => array(),
+            'album'     => $data['al']['name'],
             'pic_id'    => isset($data['al']['pic_str'])?$data['al']['pic_str']:$data['al']['pic'],
             'url_id'    => $data['id'],
             'lyric_id'  => $data['id'],
@@ -1079,6 +1093,7 @@ class Meting
             'id'        => $data['songmid'],
             'name'      => $data['songname'],
             'artist'    => array(),
+            'album'     => isset($data['albumname'])?$data['albumname']:$data['album']['name'],
             'pic_id'    => $data['albummid'],
             'url_id'    => $data['songmid'],
             'lyric_id'  => $data['songmid'],
@@ -1095,6 +1110,7 @@ class Meting
             'id'       => $data['song_id'],
             'name'     => $data['song_name'],
             'artist'   => explode(';', isset($data['singers'])?$data['singers']:$data['artist_name']),
+            'album'    => $data['album_name'],
             'pic_id'   => $data['song_id'],
             'url_id'   => $data['song_id'],
             'lyric_id' => $data['song_id'],
@@ -1108,6 +1124,7 @@ class Meting
             'id'       => $data['hash'],
             'name'     => isset($data['filename'])?$data['filename']:$data['fileName'],
             'artist'   => array(),
+            'album'    => isset($data['album_name'])?$data['album_name']:'',
             'url_id'   => $data['hash'],
             'pic_id'   => $data['hash'],
             'lyric_id' => $data['hash'],
@@ -1123,6 +1140,7 @@ class Meting
             'id'       => $data['song_id'],
             'name'     => $data['title'],
             'artist'   => explode(',', $data['author']),
+            'album'    => $data['album_title'],
             'pic_id'   => $data['song_id'],
             'url_id'   => $data['song_id'],
             'lyric_id' => $data['song_id'],

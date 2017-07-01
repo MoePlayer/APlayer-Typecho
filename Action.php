@@ -1,6 +1,5 @@
 <?php
 if(!defined('__TYPECHO_ROOT_DIR__'))exit;
-if(!extension_loaded('Meting'))include_once 'include/Meting.php';
 
 class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
 
@@ -137,6 +136,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
     }
 
     private function url(){
+        if(!extension_loaded('Meting'))include_once 'include/Meting.php';
         self::filterReferer();
         $id=$this->request->get('id');
         $site=$this->request->get('site');
@@ -154,6 +154,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
     }
 
     private function pic(){
+        if(!extension_loaded('Meting'))include_once 'include/Meting.php';
         self::filterReferer();
         $id=$this->request->get('id');
         $site=$this->request->get('site');
@@ -169,6 +170,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
     }
 
     private function lrc(){
+        if(!extension_loaded('Meting'))include_once 'include/Meting.php';
         self::filterReferer();
         $id=$this->request->get('id');
         $site=$this->request->get('site');

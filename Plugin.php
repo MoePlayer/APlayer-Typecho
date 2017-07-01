@@ -6,13 +6,13 @@ if(!defined('__TYPECHO_ROOT_DIR__'))exit;
  *
  * @package Meting
  * @author METO
- * @version 1.1.2
+ * @version 1.2.0
  * @dependence 14.10.10-*
  * @link https://github.com/metowolf/Meting-Typecho-Plugin
  *
  */
 
-define('METING_VERSION','1.1.2');
+define('METING_VERSION','1.2.0');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -56,6 +56,11 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
      * @return void
      */
     public static function config(Typecho_Widget_Helper_Form $form){
+        $t = new Typecho_Widget_Helper_Form_Element_Radio(
+            'cloudapi', array('true'=>_t('是'),'false'=>_t('否')),'false',
+            _t('METO 云解析 (beta)'),
+            _t('当插件无法正常工作时，可以勾选开启。<b>歌单混播、音质调节将失效</b>'));
+        $form->addInput($t);
         $t = new Typecho_Widget_Helper_Form_Element_Text(
             'theme', null, '#ad7a86',
             _t('播放器颜色'),
@@ -100,12 +105,19 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
     public static function header(){
         $dir=Helper::options()->pluginUrl.'/Meting/assets/';
         $ver=METING_VERSION;
-        echo "<!-- Meting Start -->
-                <script type=\"text/javascript\" src=\"{$dir}APlayer.min.js?v={$ver}\"></script>
-            <!-- Meting End -->";
+        echo "<!-- Meting Start -->\n";
+        echo "<script type=\"text/javascript\" src=\"{$dir}APlayer.min.js?v={$ver}\"></script>\n";
+        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi){
+            echo "<script src=\"https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js\"></script>\n";
+        }
+        echo "<!-- Meting End -->\n";
     }
 
-    public static function footer(){}
+    public static function footer(){
+        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi){
+            echo "<script type=\"text/javascript\" src=\"https://api.i-meto.com/music/player.js?v={$ver}\"></script>\n";
+        }
+    }
 
     public static function getPID(){
         return ++self::$PID;
@@ -122,9 +134,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
     }
 
     public static function parseCallback($matches){
-        $t=self::shortcode_parse_atts(htmlspecialchars_decode($matches[3]));
-        $setting=base64_encode(json_encode($t));
-
+        $setting=self::shortcode_parse_atts(htmlspecialchars_decode($matches[3]));
         $matches[5]=htmlspecialchars_decode($matches[5]);
         $pattern=self::get_shortcode_regex(array('Music'));
         preg_match_all("/$pattern/",$matches[5],$all);
@@ -135,15 +145,33 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $data=array();
         foreach($matches as $vo){
             $t=self::shortcode_parse_atts(htmlspecialchars_decode($vo));
-            if(!in_array($t['server'],array('netease','tencent','xiami','baidu','kugou','kuwo')))continue;
+            if(!in_array($t['server'],array('netease','tencent','xiami','baidu','kugou')))continue;
             if(!in_array($t['type'],array('search','album','playlist','artist','song')))continue;
             $data[]=$t;
         }
         $id=self::getPID();
         $dir=Typecho_Common::url('MetingAPI',Helper::options()->index);
-        $data=base64_encode(json_encode($data));
-        return "<div id=\"MetingPlayer{$id}\" class=\"aplayer\" /></div>
-                <script type=\"text/javascript\" src=\"{$dir}?do=musicjs&s={$setting}&d={$data}&id={$id}\" async defer></script>";
+        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi){
+            $str="<div class=\"aplayer\" data-id=\"{$data[0]['id']}\" data-server=\"{$data[0]['server']}\" data-type=\"{$data[0]['type']}\"";
+            $player=array(
+                'theme'    => $setting['theme']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->theme?:'red',
+                'preload'  => $setting['preload']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->preload?:'auto',
+                'autoplay' => $setting['autoplay']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->autoplay?:'false',
+                'height'   => $setting['height']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->height?:'340px',
+                'mode'   => $setting['mode']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->mode?:'circulation',
+            );
+            foreach($player as $key=>$vo){
+                $str.=" data-{$key}=\"{$vo}\"";
+            }
+            $str.="></div>\n";
+            return $str;
+        }
+        else{
+            $setting=base64_encode(json_encode($setting));
+            $data=base64_encode(json_encode($data));
+            return "<div id=\"MetingPlayer{$id}\" class=\"aplayer\" /></div>
+                    <script type=\"text/javascript\" src=\"{$dir}?do=musicjs&s={$setting}&d={$data}&id={$id}\" async defer></script>";
+        }
     }
 
     public static function addButton(){
