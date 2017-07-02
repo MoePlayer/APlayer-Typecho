@@ -80,6 +80,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
     }
 
     private function musicjs(){
+        if(!extension_loaded('Meting'))include_once 'include/Meting.php';
         self::filterReferer();
         $PID=$this->request->get('id');
         $data=$this->request->get('d');
@@ -103,7 +104,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             'preload'  => $setting['preload']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->preload?:'auto',
             'autoplay' => $setting['autoplay']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->autoplay?:'false',
             'height'   => $setting['height']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->height?:'340px',
-            'mode'   => $setting['mode']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->mode?:'circulation',
+            'mode'     => $setting['mode']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->mode?:'circulation',
             'music'    => array(),
         );
         foreach($music as $vo){

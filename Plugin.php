@@ -6,13 +6,13 @@ if(!defined('__TYPECHO_ROOT_DIR__'))exit;
  *
  * @package Meting
  * @author METO
- * @version 1.2.0
+ * @version 1.2.1
  * @dependence 14.10.10-*
  * @link https://github.com/metowolf/Meting-Typecho-Plugin
  *
  */
 
-define('METING_VERSION','1.2.0');
+define('METING_VERSION','1.2.1');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -107,14 +107,14 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $ver=METING_VERSION;
         echo "<!-- Meting Start -->\n";
         echo "<script type=\"text/javascript\" src=\"{$dir}APlayer.min.js?v={$ver}\"></script>\n";
-        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi){
+        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi=='true'){
             echo "<script src=\"https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js\"></script>\n";
         }
         echo "<!-- Meting End -->\n";
     }
 
     public static function footer(){
-        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi){
+        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi=='true'){
             echo "<script type=\"text/javascript\" src=\"https://api.i-meto.com/music/player.js?v={$ver}\"></script>\n";
         }
     }
@@ -151,7 +151,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         }
         $id=self::getPID();
         $dir=Typecho_Common::url('MetingAPI',Helper::options()->index);
-        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi){
+        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi=='true'){
             $str="<div class=\"aplayer\" data-id=\"{$data[0]['id']}\" data-server=\"{$data[0]['server']}\" data-type=\"{$data[0]['type']}\"";
             $player=array(
                 'theme'    => $setting['theme']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->theme?:'red',
