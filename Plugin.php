@@ -6,13 +6,13 @@ if(!defined('__TYPECHO_ROOT_DIR__'))exit;
  *
  * @package Meting
  * @author METO
- * @version 1.2.1
+ * @version 1.2.2
  * @dependence 14.10.10-*
  * @link https://github.com/metowolf/Meting-Typecho-Plugin
  *
  */
 
-define('METING_VERSION','1.2.1');
+define('METING_VERSION','1.2.2');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -26,7 +26,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
      */
     public static function activate(){
         Meting_Plugin::install();
-        Helper::addRoute("Meting_Route","/MetingAPI","Meting_Action",'action');
+        Helper::addAction('metingapi', 'Meting_Action');
         Typecho_Plugin::factory('Widget_Abstract_Contents')->contentEx=array('Meting_Plugin','playerReplace');
         Typecho_Plugin::factory('Widget_Abstract_Contents')->excerptEx=array('Meting_Plugin','playerReplace');
         Typecho_Plugin::factory('Widget_Archive')->header=array('Meting_Plugin','header');
@@ -45,7 +45,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
      */
     public static function deactivate(){
         Meting_Plugin::uninstall();
-        Helper::removeRoute("Meting_Route");
+        Helper::removeAction("metingapi");
     }
 
     /**
@@ -150,7 +150,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
             $data[]=$t;
         }
         $id=self::getPID();
-        $dir=Typecho_Common::url('MetingAPI',Helper::options()->index);
+        $dir=Typecho_Common::url('action/metingapi',Helper::options()->index);
         if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi=='true'){
             $str="<div class=\"aplayer\" data-id=\"{$data[0]['id']}\" data-server=\"{$data[0]['server']}\" data-type=\"{$data[0]['type']}\"";
             $player=array(
@@ -175,7 +175,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
     }
 
     public static function addButton(){
-        $url=Typecho_Common::url('MetingAPI?do=parse',Helper::options()->index);
+        $uri=Helper::options()->index('/action/metingapi').'?do=parse';
         $dir=Helper::options()->pluginUrl.'/Meting/assets/editer.js?v='.METING_VERSION;
         echo "<script type=\"text/javascript\">var murl='{$url}';</script>
                 <script type=\"text/javascript\" src=\"{$dir}\"></script>";

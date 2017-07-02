@@ -108,13 +108,13 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             'music'    => array(),
         );
         foreach($music as $vo){
-            $URI=Typecho_Common::url('MetingAPI?site='.$vo['source'],Helper::options()->index);
+            $URI=Typecho_Common::url('action/metingapi',Helper::options()->index);
             $player['music'][]=array(
                 'title'=>$vo['name'],
                 'author'=>implode(' / ',$vo['artist']),
-                'url'=>$URI.'&do=url&id='.$vo['url_id'],
-                'pic'=>$URI.'&do=pic&id='.$vo['pic_id'],
-                'lrc'=>$URI.'&do=lrc&id='.$vo['lyric_id'],
+                'url'=>$URI.'?site='.$vo['source'].'&do=url&id='.$vo['url_id'],
+                'pic'=>$URI.'?site='.$vo['source'].'&do=pic&id='.$vo['pic_id'],
+                'lrc'=>$URI.'?site='.$vo['source'].'&do=lrc&id='.$vo['lyric_id'],
             );
         }
         if(sizeof($player['music'])==1)$player['music']=$player['music'][0];
@@ -150,7 +150,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             $data=json_decode($data,1);
             self::cacheWrite($cachekey,$data);
         }
-        if(empty($data['url']))$data['url']="https://api.i-meto.com/music/copyright?s={$site}id={$id}";
+        if(empty($data['url']))$data['url']="https://api.i-meto.com/Public/music/empty.mp3";
         $this->response->redirect($data['url']);
     }
 
