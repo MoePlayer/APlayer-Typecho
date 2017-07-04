@@ -6,13 +6,13 @@ if(!defined('__TYPECHO_ROOT_DIR__'))exit;
  *
  * @package Meting
  * @author METO
- * @version 1.2.2
+ * @version 1.2.3
  * @dependence 14.10.10-*
  * @link https://github.com/metowolf/Meting-Typecho-Plugin
  *
  */
 
-define('METING_VERSION','1.2.2');
+define('METING_VERSION','1.2.3');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -175,7 +175,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
     }
 
     public static function addButton(){
-        $uri=Helper::options()->index('/action/metingapi').'?do=parse';
+        $url=Typecho_Common::url('action/metingapi',Helper::options()->index).'?do=parse';
         $dir=Helper::options()->pluginUrl.'/Meting/assets/editer.js?v='.METING_VERSION;
         echo "<script type=\"text/javascript\">var murl='{$url}';</script>
                 <script type=\"text/javascript\" src=\"{$dir}\"></script>";
