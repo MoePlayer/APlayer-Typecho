@@ -213,7 +213,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
         return $db->query($insert);
     }
 
-    private function cacheRead($k,$t=60*60){
+    private function cacheRead($k,$t=3600){
         $db=Typecho_Db::get();
         $query=$db->select('value','last')->from('table.metingv1')->where('id=?',md5($k));
         $result=$db->fetchRow($query);
