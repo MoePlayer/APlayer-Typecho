@@ -151,6 +151,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             self::cacheWrite($cachekey,$data);
         }
         if(empty($data['url']))$data['url']="https://api.i-meto.com/Public/music/empty.mp3";
+        $data['url'] = str_replace("http://","https://", $data['url']);
         $this->response->redirect($data['url']);
     }
 
