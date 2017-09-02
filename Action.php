@@ -38,10 +38,10 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             }
             elseif(strpos($url,'xiami.com')!==false){
                 $server='xiami';
-                if(preg_match('/collect\/([^\.]*)/i',$url,$id))list($id,$type)=array($id[1],'playlist');
-                elseif(preg_match('/album\/([^\.]*)/i',$url,$id))list($id,$type)=array($id[1],'album');
-                elseif(preg_match('/song\/([^\.]*)/i',$url,$id))list($id,$type)=array($id[1],'song');
-                elseif(preg_match('/artist\/([^\.]*)/i',$url,$id))list($id,$type)=array($id[1],'artist');
+                if(preg_match('/collect\/(\w+)/i',$url,$id))list($id,$type)=array($id[1],'playlist');
+                elseif(preg_match('/album\/(\w+)/i',$url,$id))list($id,$type)=array($id[1],'album');
+                elseif(preg_match('/[\/.]\w+\/[songdem]+\/(\w+)/i',$url,$id))list($id,$type)=array($id[1],'song');
+                elseif(preg_match('/artist\/(\w+)/i',$url,$id))list($id,$type)=array($id[1],'artist');
                 if(!preg_match('/^\d*$/i',$id,$t)){
                     $data=self::curl($url);
                     preg_match('/'.$type.'\/(\d+)/i',$data,$id);
@@ -51,8 +51,9 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             elseif(strpos($url,'kugou.com')!==false){
                 $server='kugou';
                 if(preg_match('/special\/single\/(\d+)/i',$url,$id))list($id,$type)=array($id[1],'playlist');
-                elseif(preg_match('/album\/single\/(\d+)/i',$url,$id))list($id,$type)=array($id[1],'album');
-                elseif(preg_match('/singer\/home\/(\d+)/i',$url,$id))list($id,$type)=array($id[1],'artist');
+                elseif(preg_match('/song\/#hash\=(\w+)/i',$url,$id))list($id,$type)=array($id[1],'song');
+                elseif(preg_match('/album\/[single\/]*(\d+)/i',$url,$id))list($id,$type)=array($id[1],'album');
+                elseif(preg_match('/singer\/[home\/]*(\d+)/i',$url,$id))list($id,$type)=array($id[1],'artist');
             }
             elseif(strpos($url,'baidu.com')!==false){
                 $server='baidu';
