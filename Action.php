@@ -101,11 +101,11 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             $music=array_merge($music,$t);
         }
         $player=array(
-            'theme'    => $setting['theme']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->theme?:'red',
-            'preload'  => $setting['preload']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->preload?:'auto',
-            'autoplay' => $setting['autoplay']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->autoplay?:'false',
-            'height'   => $setting['height']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->height?:'340px',
-            'mode'     => $setting['mode']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->mode?:'circulation',
+            'theme'    => isset($setting['theme'])?$setting['theme']:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->theme?:'red',
+            'preload'  => isset($setting['preload'])?$setting['preload']:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->preload?:'auto',
+            'autoplay' => isset($setting['autoplay'])?$setting['autoplay']:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->autoplay?:'false',
+            'height'   => isset($setting['height'])?$setting['height']:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->height?:'340px',
+            'mode'     => isset($setting['mode'])?$setting['mode']:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->mode?:'circulation',
             'music'    => array(),
         );
         foreach($music as $vo){
@@ -143,15 +143,21 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
         $id=$this->request->get('id');
         $site=$this->request->get('site');
         $rate=Typecho_Widget::widget('Widget_Options')->plugin('Meting')->bitrate;
+        $cookie=Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cookie;
 
         $cachekey="url/{$site}/{$id}/{$rate}";
         $data=self::cacheRead($cachekey,60*15);
         if(!$data){
-            $data=(new \Metowolf\Meting($site))->format()->url($id,$rate);
+            $api=(new \Metowolf\Meting($site));
+            if($cookie!='')$api->cookie($cookie);
+            $data=$api->format(true)->url($id,$rate);
             $data=json_decode($data,1);
             self::cacheWrite($cachekey,$data);
         }
         if(empty($data['url']))$data['url']="https://api.i-meto.com/Public/music/empty.mp3";
+        if($site=='netease'){
+            $data['url']=str_replace("http://","https://",$data['url']);
+        }
         $this->response->redirect($data['url']);
     }
 
@@ -229,6 +235,12 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
         }
         else return false;
     }
+
+    /*private function cacheFlush(){
+        $db=Typecho_Db::get();
+        $delete=$db->delete('table.metingv1')->where('last<?',time());
+        $db->query($delete);
+    }*/
 
     private function filterReferer(){
         if(isset($_SERVER['HTTP_REFERER'])&&strpos($_SERVER['HTTP_REFERER'],$_SERVER['HTTP_HOST'])===false){

@@ -6,13 +6,13 @@ if(!defined('__TYPECHO_ROOT_DIR__'))exit;
  *
  * @package Meting
  * @author METO
- * @version 1.2.4
+ * @version 1.2.5
  * @dependence 14.10.10-*
  * @link https://github.com/metowolf/Meting-Typecho-Plugin
  *
  */
 
-define('METING_VERSION','1.2.4');
+define('METING_VERSION','1.2.5');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -91,6 +91,11 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
             _t('默认音质'),
             _t(''));
         $form->addInput($t);
+        $t = new Typecho_Widget_Helper_Form_Element_Text(
+            'cookie', null, '',
+            _t('自定义 Cookie (高级)'),
+            _t('通过更改 Cookie，使其享受与客户端一样的体验'));
+        $form->addInput($t);
     }
 
     public static function personalConfig(Typecho_Widget_Helper_Form $form){}
@@ -107,15 +112,13 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $ver=METING_VERSION;
         echo "<!-- Meting Start -->\n";
         echo "<script type=\"text/javascript\" src=\"{$dir}APlayer.min.js?v={$ver}\"></script>\n";
-        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi=='true'){
-            echo "<script src=\"https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js\"></script>\n";
-        }
         echo "<!-- Meting End -->\n";
     }
 
     public static function footer(){
+        $ver=METING_VERSION;
         if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi=='true'){
-            echo "<script type=\"text/javascript\" src=\"https://api.i-meto.com/music/player.js?v={$ver}\"></script>\n";
+            echo "<script type=\"text/javascript\" src=\"https://api.i-meto.com/music/aplayer.min.js?v={$ver}\"></script>\n";
         }
     }
 

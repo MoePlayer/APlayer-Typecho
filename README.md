@@ -1,6 +1,8 @@
-![](http://ww2.sinaimg.cn/large/a15b4afegw1fbg1l7wn09j20fw05gq34)
+<p align="center">
+<img src="https://user-images.githubusercontent.com/2666735/28999701-04c6ba7e-7a84-11e7-804b-3ffa4f7d5d95.png" alt="Meting">
+</p>
 
-# Meting for Typecho
+# APlayer for Typecho (Meting)
 在 Typecho 中使用 APlayer 播放在线音乐吧～  
 [发布页面](https://i-meto.com/meting-typecho/)  
 
@@ -8,7 +10,7 @@
  1. 支持国内五大音乐平台（网易云、QQ、虾米、百度、酷狗）的单曲/专辑/歌单播放
  2. 简单快捷，复制音乐详情页面网址，后台自动生成播放代码
  3. **支持不同音乐平台歌曲混合播放**
- 4. 前端 Aplayer，后端 Meting 及时更新，保证兼容性及 API 高可用性
+ 4. 前端 APlayer，后端 Meting 及时更新，保证兼容性及 API 高可用性
  5. 支持 MySql、SQLite 数据库
 
 ## 声明
@@ -65,4 +67,4 @@ A: 为了减少服务器压力，插件设置对歌单、歌词数据进行缓�
 更多问题可以通过 issue 页面提交，或者通过 Telegram、邮件向我反馈
 
 ## LICENSE
-Meting-Typecho-Plugin is under the MIT license.
+APlayer-Typecho-Plugin is under the MIT license.
