@@ -1,17 +1,18 @@
 <p align="center">
-<img src="https://user-images.githubusercontent.com/2666735/28999701-04c6ba7e-7a84-11e7-804b-3ffa4f7d5d95.png" alt="Meting">
+<img src="https://user-images.githubusercontent.com/2666735/30651452-58ae6c88-9deb-11e7-9e13-6beae3f6c54c.png" alt="Meting">
 </p>
 
-# APlayer for Typecho (Meting)
+# APlayer for Typecho
 在 Typecho 中使用 APlayer 播放在线音乐吧～  
 [发布页面](https://i-meto.com/meting-typecho/)  
 
 ## 介绍
  1. 支持国内五大音乐平台（网易云、QQ、虾米、百度、酷狗）的单曲/专辑/歌单播放
  2. 简单快捷，复制音乐详情页面网址，后台自动生成播放代码
- 3. **支持不同音乐平台歌曲混合播放**
- 4. 前端 APlayer，后端 Meting 及时更新，保证兼容性及 API 高可用性
- 5. 支持 MySql、SQLite 数据库
+ 3. 前端 APlayer，后端 Meting 及时更新，保证兼容性及 API 高可用性
+ 4. 支持 MySql、SQLite 数据库
+ 5. 支持自定义歌曲播放
+ 6. **自定义 API 支持**
 
 ## 声明
 本作品仅供个人学习研究使用，请勿将其用作商业用途。  
@@ -25,7 +26,6 @@
 
 ## 使用
 在文章编辑页面，点击编辑器上的 **音乐图标** 按钮，在弹出的窗口中输入音乐地址（见支持列表），最后点击确定即可  
-**歌曲混合特性:** 允许添加多个音乐地址，每行一个，插件会自动将所有歌曲合并在同一个歌单进行播放。
 
 ## 支持列表
 网易云音乐 http://music.163.com
@@ -67,4 +67,4 @@ A: 为了减少服务器压力，插件设置对歌单、歌词数据进行缓�
 更多问题可以通过 issue 页面提交，或者通过 Telegram、邮件向我反馈
 
 ## LICENSE
-APlayer-Typecho-Plugin is under the MIT license.
+APlayer-Typecho is under the MIT license.

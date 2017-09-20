@@ -8,7 +8,7 @@ $(function() {
                     '<div>'+
                         '<p><b>插入音乐</b></p>'+
                         '<p>请在下方的输入框内输入要插入的音乐地址，如多个地址请用回车隔开'+
-                        '<p><textarea type="text" rows="5" cols="40"></textarea></p>'+
+                        '<p><input type="text"></input></p>'+
                     '</div>'+
                     '<form>'+
     					'<button type="button" class="btn btn-s primary" id="ok">确定</button>'+
@@ -16,7 +16,7 @@ $(function() {
                     '</form>'+
 				'</div>'+
 			'</div>');
-        $('.wmd-prompt-dialog textarea').val('http://').select();
+        $('.wmd-prompt-dialog input').val('http://').select();
 	});
     $(document).on('click','#cancel',function() {
         $('#MetingPanel').remove();
@@ -26,7 +26,7 @@ $(function() {
         callback=$.ajax({
             type:'POST',
             url:murl,
-            data:{data:$('.wmd-prompt-dialog textarea').val()},
+            data:{data:$('.wmd-prompt-dialog input').val()},
             async:false
         });
         $('#MetingPanel').remove();

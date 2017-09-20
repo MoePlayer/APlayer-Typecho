@@ -2,21 +2,20 @@
 if(!defined('__TYPECHO_ROOT_DIR__'))exit;
 
 /**
- * Meting for Typecho | 在 Typecho 中使用 APlayer 播放在线音乐吧～
+ * APlayer for Typecho | 在 Typecho 中使用 APlayer 播放在线音乐吧～
  *
- * @package Meting
+ * @package APlayer for Typecho | Meting
  * @author METO
- * @version 1.2.5
+ * @version 2.0.0
  * @dependence 14.10.10-*
- * @link https://github.com/metowolf/Meting-Typecho-Plugin
+ * @link https://github.com/MoePlayer/APlayer-Typecho
  *
  */
 
-define('METING_VERSION','1.2.5');
+define('METING_VERSION','2.0.0');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
-    protected static $PID = 0;
     /**
      * 激活插件方法,如果激活失败,直接抛出异常
      *
@@ -56,11 +55,6 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
      * @return void
      */
     public static function config(Typecho_Widget_Helper_Form $form){
-        $t = new Typecho_Widget_Helper_Form_Element_Radio(
-            'cloudapi', array('true'=>_t('是'),'false'=>_t('否')),'false',
-            _t('METO 云解析 (beta)'),
-            _t('当插件无法正常工作时，可以勾选开启。<b>歌单混播、音质调节将失效</b>'));
-        $form->addInput($t);
         $t = new Typecho_Widget_Helper_Form_Element_Text(
             'theme', null, '#ad7a86',
             _t('播放器颜色'),
@@ -92,10 +86,44 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
             _t(''));
         $form->addInput($t);
         $t = new Typecho_Widget_Helper_Form_Element_Text(
-            'cookie', null, '',
-            _t('自定义 Cookie (高级)'),
-            _t('通过更改 Cookie，使其享受与客户端一样的体验'));
+            'api', null, Typecho_Common::url('action/metingapi',Helper::options()->index)."?server=:server&type=:type&id=:id&r=:r",
+            _t('云解析地址'),
+            _t('示例：https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r'));
         $form->addInput($t);
+        $t = new Typecho_Widget_Helper_Form_Element_Text(
+            'salt', null, md5(time()."Meting"),
+            _t('接口保护'),
+            _t('加盐保护 API 接口不被滥用，自动生成无需设置。'));
+        $form->addInput($t);
+        $t = new Typecho_Widget_Helper_Form_Element_Textarea(
+            'cookie', null, '',
+            _t('网易云音乐 Cookie (高级)'),
+            _t('如果您是网易云音乐的会员，可以将您的 cookie 填入此处来获取云盘等付费资源，听歌将不会计入下载次数。<br><b>如果不知道这是什么意思，忽略即可。</b>'));
+        $form->addInput($t);
+        $t = new Typecho_Widget_Helper_Form_Element_Radio(
+            'clean', array(_t('关闭'), _t('清除所有缓存')), 0,
+            _t('保存时清除所有缓存'));
+        $form->addInput($t);
+    }
+
+    /**
+     * 手动保存配置句柄
+     * @param $config array 插件配置
+     * @param $is_init bool 是否初始化
+     */
+    public static function configHandle($config, $is_init)
+    {
+        if($is_init!=true){
+            if($config['api']==""){
+                $config['api']=Typecho_Common::url('action/metingapi',Helper::options()->index)."?server=:server&type=:type&id=:id&r=:r";
+            }
+            if($config['clean']==1){
+                self::clean();
+                $config['clean']=0;
+            }
+        }
+
+        Helper::configPlugin('Meting', $config);
     }
 
     public static function personalConfig(Typecho_Widget_Helper_Form $form){}
@@ -108,22 +136,17 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
      * @return void
      */
     public static function header(){
-        $dir=Helper::options()->pluginUrl.'/Meting/assets/';
+        $api=Typecho_Widget::widget('Widget_Options')->plugin('Meting')->api;
+        $dir=Helper::options()->pluginUrl.'/Meting/assets';
         $ver=METING_VERSION;
-        echo "<!-- Meting Start -->\n";
-        echo "<script type=\"text/javascript\" src=\"{$dir}APlayer.min.js?v={$ver}\"></script>\n";
-        echo "<!-- Meting End -->\n";
+        echo "<script type=\"text/javascript\" src=\"{$dir}/aplayer.min.js?v={$ver}\"></script>\n";
+        echo "<script>var meting_api=\"{$api}\";</script>";
     }
 
     public static function footer(){
+        $dir=Helper::options()->pluginUrl.'/Meting/assets';
         $ver=METING_VERSION;
-        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi=='true'){
-            echo "<script type=\"text/javascript\" src=\"https://api.i-meto.com/music/aplayer.min.js?v={$ver}\"></script>\n";
-        }
-    }
-
-    public static function getPID(){
-        return ++self::$PID;
+        echo "<script type=\"text/javascript\" src=\"{$dir}/Meting.min.js?v={$ver}\"></script>\n";
     }
 
     public static function playerReplace($data,$widget,$last){
@@ -146,35 +169,36 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 
     public static function parseMusic($matches,$setting){
         $data=array();
+        $str="";
         foreach($matches as $vo){
             $t=self::shortcode_parse_atts(htmlspecialchars_decode($vo));
-            if(!in_array($t['server'],array('netease','tencent','xiami','baidu','kugou')))continue;
-            if(!in_array($t['type'],array('search','album','playlist','artist','song')))continue;
-            $data[]=$t;
-        }
-        $id=self::getPID();
-        $dir=Typecho_Common::url('action/metingapi',Helper::options()->index);
-        if(Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cloudapi=='true'){
-            $str="<div class=\"aplayer\" data-id=\"{$data[0]['id']}\" data-server=\"{$data[0]['server']}\" data-type=\"{$data[0]['type']}\"";
             $player=array(
-                'theme'    => $setting['theme']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->theme?:'red',
-                'preload'  => $setting['preload']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->preload?:'auto',
-                'autoplay' => $setting['autoplay']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->autoplay?:'false',
-                'height'   => $setting['height']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->height?:'340px',
-                'mode'   => $setting['mode']?:Typecho_Widget::widget('Widget_Options')->plugin('Meting')->mode?:'circulation',
+                'theme'    => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->theme?:'red',
+                'preload'  => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->preload?:'auto',
+                'autoplay' => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->autoplay?:'false',
+                'height'   => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->height?:'340px',
+                'mode'   => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->mode?:'circulation',
             );
-            foreach($player as $key=>$vo){
-                $str.=" data-{$key}=\"{$vo}\"";
+            if(isset($t['server'])){
+                if(!in_array($t['server'],array('netease','tencent','xiami','baidu','kugou')))continue;
+                if(!in_array($t['type'],array('search','album','playlist','artist','song')))continue;
+                $data=$t;
+
+                $str.="<div class=\"aplayer\" data-id=\"{$data['id']}\" data-server=\"{$data['server']}\" data-type=\"{$data['type']}\"";
+                if(is_array($setting))foreach($setting as $key=>$vo)$player[$key]=$vo;
+                foreach($player as $key=>$vo)$str.=" data-{$key}=\"{$vo}\"";
+                $str.="></div>\n";
             }
-            $str.="></div>\n";
-            return $str;
+            else{
+                $data=$t;
+
+                $str.="<div class=\"aplayer\" data-title=\"{$data['title']}\" data-author=\"{$data['author']}\" data-url=\"{$data['url']}\"";
+                if(is_array($setting))foreach($setting as $key=>$vo)$player[$key]=$vo;
+                foreach($player as $key=>$vo)$str.=" data-{$key}=\"{$vo}\"";
+                $str.="></div>\n";
+            }
         }
-        else{
-            $setting=base64_encode(json_encode($setting));
-            $data=base64_encode(json_encode($data));
-            return "<div id=\"MetingPlayer{$id}\" class=\"aplayer\" /></div>
-                    <script type=\"text/javascript\" src=\"{$dir}?do=musicjs&s={$setting}&d={$data}&id={$id}\" async defer></script>";
-        }
+        return $str;
     }
 
     public static function addButton(){
@@ -226,9 +250,9 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $dbname=$db->getPrefix().'metingv1';
         try{
             $db->query("CREATE TABLE IF NOT EXISTS {$dbname} (
-                        id CHAR(32) PRIMARY KEY     NOT NULL UNIQUE,
-                        value               TEXT    NOT NULL,
-                        last                int     NOT NULL
+                        id VARCHAR(32) PRIMARY KEY     NOT NULL UNIQUE,
+                        value                  TEXT    NOT NULL,
+                        last                   int     NOT NULL
                     )");
         }catch(Typecho_Db_Exception $e){
             $code=$e->getCode();
@@ -236,11 +260,18 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         }
     }
 
+    private function clean(){
+        $db=Typecho_Db::get();
+        $dbname=$db->getPrefix().'metingv1';
+        $delete=$db->delete($dbname);
+        $db->query($delete);
+    }
+
     public static function uninstall(){
         $db=Typecho_Db::get();
         $dbname=$db->getPrefix().'metingv1';
         try{
-            $db->query("DROP TABLE IF EXISTS {$dbname};");
+            $db->query("DROP TABLE IF EXISTS {$dbname}");
         }catch(Typecho_Db_Exception $e){
             $code=$e->getCode();
             throw new Typecho_Plugin_Exception('插件禁用失败。错误号：'.$code);
