@@ -6,13 +6,13 @@ if(!defined('__TYPECHO_ROOT_DIR__'))exit;
  *
  * @package APlayer for Typecho | Meting
  * @author METO
- * @version 2.0.0
+ * @version 2.0.1
  * @dependence 14.10.10-*
  * @link https://github.com/MoePlayer/APlayer-Typecho
  *
  */
 
-define('METING_VERSION','2.0.0');
+define('METING_VERSION','2.0.1');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -139,7 +139,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $api=Typecho_Widget::widget('Widget_Options')->plugin('Meting')->api;
         $dir=Helper::options()->pluginUrl.'/Meting/assets';
         $ver=METING_VERSION;
-        echo "<script type=\"text/javascript\" src=\"{$dir}/aplayer.min.js?v={$ver}\"></script>\n";
+        echo "<script type=\"text/javascript\" src=\"{$dir}/APlayer.min.js?v={$ver}\"></script>\n";
         echo "<script>var meting_api=\"{$api}\";</script>";
     }
 
@@ -173,11 +173,11 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         foreach($matches as $vo){
             $t=self::shortcode_parse_atts(htmlspecialchars_decode($vo));
             $player=array(
-                'theme'    => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->theme?:'red',
-                'preload'  => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->preload?:'auto',
-                'autoplay' => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->autoplay?:'false',
-                'height'   => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->height?:'340px',
-                'mode'   => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->mode?:'circulation',
+                'theme'         => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->theme?:'red',
+                'preload'       => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->preload?:'auto',
+                'autoplay'      => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->autoplay?:'false',
+                'listmaxheight' => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->height?:'340px',
+                'mode'          => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->mode?:'circulation',
             );
             if(isset($t['server'])){
                 if(!in_array($t['server'],array('netease','tencent','xiami','baidu','kugou')))continue;
@@ -205,7 +205,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $url=Typecho_Common::url('action/metingapi',Helper::options()->index).'?do=parse';
         $dir=Helper::options()->pluginUrl.'/Meting/assets/editer.js?v='.METING_VERSION;
         echo "<script type=\"text/javascript\">var murl='{$url}';</script>
-                <script type=\"text/javascript\" src=\"{$dir}\"></script>";
+              <script type=\"text/javascript\" src=\"{$dir}\"></script>";
     }
 
     # https://github.com/WordPress/WordPress/blob/master/wp-includes/shortcodes.php#L508

@@ -64,16 +64,19 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             if(empty($data)){
                 $rate=Typecho_Widget::widget('Widget_Options')->plugin('Meting')->bitrate;
                 $cookie=Typecho_Widget::widget('Widget_Options')->plugin('Meting')->cookie;
-                if($server=='netease')$api->cookie($cookie);
+                if($server=='netease'&&!empty($cookie))$api->cookie($cookie);
                 $data=$api->url($id,$rate);
                 $this->cacheWrite($EID,$data);
             }
             $data=json_decode($data,true);
             $url=$data['url'];
 
-            $url=str_replace('http://m8','https://m8',$url);
-            $url=str_replace('http://m7','https://m8',$url);
-            $url=str_replace('http://m10','https://m10',$url);
+            if($server=='netease'){
+                $url=str_replace('://m8c.','://m8.',$url);
+                $url=str_replace('http://m8.','https://m8.',$url);
+                $url=str_replace('http://m7.','https://m8.',$url);
+                $url=str_replace('http://m10.','https://m10.',$url);
+            }
 
             if(empty($url))$url='https://api.i-meto.com/Public/music/empty.mp3';
             $this->response->redirect($url);
