@@ -192,7 +192,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
             else{
                 $data=$t;
 
-                $str.="<div class=\"aplayer\" data-title=\"{$data['title']}\" data-author=\"{$data['author']}\" data-url=\"{$data['url']}\"";
+                $str.="<div class=\"aplayer\" data-title=\"{$data['title']}\" data-author=\"{$data['author']}\" data-url=\"{$data['url']}\" data-pic=\"{$data['pic']}\" data-lrc=\"{$data['lrc']}\"";
                 if(is_array($setting))foreach($setting as $key=>$vo)$player[$key]=$vo;
                 foreach($player as $key=>$vo)$str.=" data-{$key}=\"{$vo}\"";
                 $str.="></div>\n";
