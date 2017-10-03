@@ -72,6 +72,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             $url=$data['url'];
 
             if($server=='netease'){
+                $url=str_replace('://m7c.','://m8.',$url);
                 $url=str_replace('://m8c.','://m8.',$url);
                 $url=str_replace('http://m8.','https://m8.',$url);
                 $url=str_replace('http://m7.','https://m8.',$url);
@@ -153,7 +154,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             elseif(preg_match('/artist\/(\d+)/i',$url,$id))list($id,$type)=array($id[1],'artist');
         }
         else{
-            echo "[Meting]\n[Music title=\"歌曲名\" author=\"歌手\" url=\"{$url}\"/]\n[/Meting]\n";
+            echo "[Meting]\n[Music title=\"歌曲名\" author=\"歌手\" url=\"{$url}\" pic=\"图片文件URL\" lrc=\"歌词文件URL\"/]\n[/Meting]\n";
             return;
         }
         echo "[Meting]\n[Music server=\"{$server}\" id=\"{$id}\" type=\"{$type}\"/]\n[/Meting]\n";
