@@ -142,7 +142,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
         elseif(strpos($url,'kugou.com')!==false){
             $server='kugou';
             if(preg_match('/special\/single\/(\d+)/i',$url,$id))list($id,$type)=array($id[1],'playlist');
-            elseif(preg_match('/song\/#hash\=(\w+)/i',$url,$id))list($id,$type)=array($id[1],'song');
+            elseif(preg_match('/#hash\=(\w+)/i',$url,$id))list($id,$type)=array($id[1],'song');
             elseif(preg_match('/album\/[single\/]*(\d+)/i',$url,$id))list($id,$type)=array($id[1],'album');
             elseif(preg_match('/singer\/[home\/]*(\d+)/i',$url,$id))list($id,$type)=array($id[1],'artist');
         }

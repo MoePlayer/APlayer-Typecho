@@ -35,11 +35,11 @@
  - 歌单 http://music.163.com/#/playlist?id=436843836
  - 榜单 http://music.163.com/#/discover/toplist?id=60198
 
-QQ 音乐 http://y.qq.com
-- 单曲 https://y.qq.com/portal/song/000jDQWP4JiB3y.html
-- 专辑 https://y.qq.com/portal/album/003rytri2FHG3V.html
-- 歌手 https://y.qq.com/portal/singer/003Nz2So3XXYek.html
-- 歌单 https://y.qq.com/portal/playlist/1144188779.html
+QQ 音乐 https://y.qq.com
+- 单曲 https://y.qq.com/n/yqq/song/000jDQWP4JiB3y.html
+- 专辑 https://y.qq.com/n/yqq/album/003rytri2FHG3V.html
+- 歌手 https://y.qq.com/n/yqq/singer/003Nz2So3XXYek.html
+- 歌单 https://y.qq.com/n/yqq/playlist/1144188779.html
 
 虾米音乐 http://www.xiami.com or http://h.xiami.com
 - 单曲 http://www.xiami.com/song/bf08DNT3035f
@@ -48,7 +48,7 @@ QQ 音乐 http://y.qq.com
 - 歌单 http://www.xiami.com/collect/254478782
 
 酷狗音乐 http://www.kugou.com
-- 单曲 暂不支持直接解析，可直接修改短代码实现
+- 单曲 http://www.kugou.com/song/#hash=09E8DE70A24C97B92A29F6A19F3528A2
 - 专辑 http://www.kugou.com/yy/album/single/1645030.html
 - 歌手 http://www.kugou.com/yy/singer/home/3520.html
 - 歌单 http://www.kugou.com/yy/special/single/119859.html
@@ -63,6 +63,19 @@ QQ 音乐 http://y.qq.com
 Q: 如何清除歌单、歌词缓存？  
 A: 为了减少服务器压力，插件设置对歌单、歌词数据进行缓存，缓存会根据时间周期自动更新管理，无需人工干预。**如果需要强制清除，可以通过禁用再启用插件实现，不影响文章中歌曲信息**  
 ...
+
+Q: pjax 页面切换无法停止播放？
+A: 需要另外在主题的回调函数中添加
+```
+if (typeof aplayers !== 'undefined'){
+    for (var i = 0; i < aplayers.length; i++) {
+        try {aplayers[i].destroy()} catch(e){}
+    }
+}
+```
+
+Q: 不支持混合歌单？
+A: 由于 2.0 版本重写了实现方式，旧的混合歌单将不再支持，建议通过各音乐平台创建歌单的方式添加。
 
 更多问题可以通过 issue 页面提交，或者通过 Telegram、邮件向我反馈
 
