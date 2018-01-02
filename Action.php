@@ -72,14 +72,14 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do {
             $url=$data['url'];
 
             if($server=='netease'){
-                $url=str_replace('://m7c.','://m8.',$url);
+                $url=str_replace('://m7c.','://m7.',$url);
                 $url=str_replace('://m8c.','://m8.',$url);
-                $url=str_replace('http://m8.','https://m8.',$url);
-                $url=str_replace('http://m7.','https://m8.',$url);
+                $url=str_replace('http://m8.','https://m9.',$url);
+                $url=str_replace('http://m7.','https://m9.',$url);
                 $url=str_replace('http://m10.','https://m10.',$url);
             }
 
-            if(empty($url))$url='https://api.i-meto.com/Public/music/empty.mp3';
+            if(empty($url))$url='https://meting.coding.i-meto.com/empty.mp3';
             $this->response->redirect($url);
         }
         else{
