@@ -6,13 +6,13 @@ if(!defined('__TYPECHO_ROOT_DIR__'))exit;
  *
  * @package APlayer for Typecho | Meting
  * @author METO
- * @version 2.0.4
+ * @version 2.0.5
  * @dependence 14.10.10-*
  * @link https://github.com/MoePlayer/APlayer-Typecho
  *
  */
 
-define('METING_VERSION','2.0.4');
+define('METING_VERSION','2.0.5');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
