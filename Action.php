@@ -241,7 +241,7 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do
             die('非管理员，禁止操作!');
         }
 
-        header("Content-Type: application/javascript");
+        header("Content-Type: text/plain; charset=UTF-8");
 
         $shasum = $this->curl('https://raw.githubusercontent.com/MoePlayer/APlayer-Typecho/master/shasum.txt');
 
