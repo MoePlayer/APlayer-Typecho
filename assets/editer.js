@@ -7,7 +7,7 @@ $(function() {
                 '<div class="wmd-prompt-dialog">'+
                     '<div>'+
                         '<p><b>插入音乐</b></p>'+
-                        '<p>请在下方的输入框内输入要插入的音乐地址，如多个地址请用回车隔开'+
+                        '<p>请在下方的输入框内输入要插入的音乐地址'+
                         '<p><input type="text"></input></p>'+
                     '</div>'+
                     '<form>'+

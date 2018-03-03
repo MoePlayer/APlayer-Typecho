@@ -2,8 +2,7 @@
 <img src="https://user-images.githubusercontent.com/2666735/30651452-58ae6c88-9deb-11e7-9e13-6beae3f6c54c.png" alt="Meting">
 </p>
 
-# APlayer for Typecho
-在 Typecho 中使用 APlayer 播放在线音乐吧～  
+ > 在 Typecho 中使用 APlayer 播放在线音乐吧～
 [发布页面](https://i-meto.com/meting-typecho/)  
 
 ## 介绍
@@ -11,8 +10,9 @@
  2. 简单快捷，复制音乐详情页面网址，后台自动生成播放代码
  3. 前端 APlayer，后端 Meting 及时更新，保证兼容性及 API 高可用性
  4. 支持 MySql、SQLite 数据库
- 5. 支持自定义歌曲播放
- 6. **自定义 API 支持**
+ 5. **支持 Redis 缓存**
+ 6. 支持自定义歌曲播放
+ 7. **自定义 API 支持**
 
 ## 声明
 本作品仅供个人学习研究使用，请勿将其用作商业用途。  
@@ -60,11 +60,7 @@ QQ 音乐 https://y.qq.com
 - 歌单 http://music.baidu.com/songlist/364201689
 
 ## FAQ
-Q: 如何清除歌单、歌词缓存？  
-A: 为了减少服务器压力，插件设置对歌单、歌词数据进行缓存，缓存会根据时间周期自动更新管理，无需人工干预。**如果需要强制清除，可以通过禁用再启用插件实现，不影响文章中歌曲信息**  
-...
-
-Q: pjax 页面切换无法停止播放？
+Q: pjax 页面切换无法停止播放？  
 A: 需要另外在主题的回调函数中添加
 ```
 if (typeof aplayers !== 'undefined'){
@@ -74,8 +70,11 @@ if (typeof aplayers !== 'undefined'){
 }
 ```
 
-Q: 不支持混合歌单？
+Q: 不支持混合歌单？  
 A: 由于 2.0 版本重写了实现方式，旧的混合歌单将不再支持，建议通过各音乐平台创建歌单的方式添加。
+
+Q: 部分歌曲失效？  
+A: 可能 API 失效导致的，可以尝试点击插件升级按钮升级到最新，或填写 cookie 信息。
 
 更多问题可以通过 issue 页面提交，或者通过 Telegram、邮件向我反馈
 
