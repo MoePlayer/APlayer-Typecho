@@ -117,6 +117,9 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do
 
             if (empty($url)) {
                 $url = 'https://coding.meting.api.i-meto.com/empty.mp3';
+                if ($server == 'netease') {
+                    $url = 'https://music.163.com/song/media/outer/url?id='.$id.'.mp3';
+                }
             }
             $this->response->redirect($url);
         } else {
