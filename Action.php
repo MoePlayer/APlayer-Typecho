@@ -328,11 +328,8 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do
 
         foreach ($shasum as $remote) {
             list($remote_sha256, $filename) = explode('  ', $remote);
-            if (!file_exists(__DIR__.'/'.$filename)) {
-                continue;
-            }
-            $local_sha256 = hash('sha256', file_get_contents(__DIR__.'/'.$filename));
-            if (!hash_equals($local_sha256, $remote_sha256)) {
+            if (!file_exists(__DIR__.'/'.$filename) ||
+                !hash_equals(hash('sha256', file_get_contents(__DIR__.'/'.$filename)), $remote_sha256)) {
                 echo "下载     ".$filename;
                 $url = 'https://raw.githubusercontent.com/MoePlayer/APlayer-Typecho/master'.substr($filename, 1);
 
