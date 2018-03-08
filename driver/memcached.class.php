@@ -1,26 +1,27 @@
 <?php
 class MetingCache implements MetingCacheI
 {
-    private $redis = null;
+    private $memcached = null;
     public function __construct($option)
     {
-        $this->redis = new Redis();
-        $this->redis->connect($option['host'], $option['port']);
+        $this->memcached = new Memcached();
+        $this->memcached->addServer($option['host'], $option['port']);
+        assert($this->memcached->getVersion()!==false);
     }
     public function install()
     {
     }
     public function set($key, $value, $expire = 86400)
     {
-        return $this->redis->set($key, $value, $expire);
+        return $this->memcached->set($key, $value, $expire);
     }
     public function get($key)
     {
-        return $this->redis->get($key);
+        return $this->memcached->get($key);
     }
     public function flush()
     {
-        return $this->redis->flushDb();
+        return $this->memcached->flush();
     }
     public function check()
     {

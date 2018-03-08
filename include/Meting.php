@@ -3,7 +3,7 @@
  * Meting music framework
  * https://i-meto.com
  * https://github.com/metowolf/Meting
- * Version 1.5.0.
+ * Version 1.5.2.
  *
  * Copyright 2018, METO Sheel <i@i-meto.com>
  * Released under the MIT license
@@ -13,8 +13,7 @@ namespace Metowolf;
 
 class Meting
 {
-    const VERSION = '1.5.0';
-    const DEFAULT_TIMEOUT = 30;
+    const VERSION = '1.5.2';
 
     public $raw;
     public $data;
@@ -24,6 +23,13 @@ class Meting
 
     public $server;
     public $format = false;
+    public $header = array(
+        'Accept'          => '*/*',
+        'Accept-Encoding' => 'gzip, deflate',
+        'Accept-Language' => 'zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4',
+        'Connection'      => 'keep-alive',
+        'Content-Type'    => 'application/x-www-form-urlencoded',
+    );
 
     public function __construct($value = 'netease')
     {
@@ -34,17 +40,14 @@ class Meting
     {
         $suppose = array('netease', 'tencent', 'xiami', 'kugou', 'baidu');
         $this->server = in_array($value, $suppose) ? $value : 'netease';
-        $data = $this->curlset();
-        $this->cookie = $data['cookie'];
-        $this->referer = $data['referer'];
-        $this->useragent = $data['useragent'];
+        $this->header = $this->curlset();
 
         return $this;
     }
 
     public function cookie($value)
     {
-        $this->cookie = $value;
+        $this->header['Cookie'] = $value;
 
         return $this;
     }
@@ -86,14 +89,17 @@ class Meting
         return $this->data;
     }
 
-    private function curl($url, $payload = null, $header = 0)
+    private function curl($url, $payload = null, $headerOnly = 0)
     {
+        $header = array_map(function ($k, $v) {
+            return $k.': '.$v;
+        }, array_keys($this->header), $this->header);
         $curl = curl_init();
         if (!is_null($payload)) {
             curl_setopt($curl, CURLOPT_POST, 1);
             curl_setopt($curl, CURLOPT_POSTFIELDS, is_array($payload) ? http_build_query($payload) : $payload);
         }
-        curl_setopt($curl, CURLOPT_HEADER, $header);
+        curl_setopt($curl, CURLOPT_HEADER, $headerOnly);
         curl_setopt($curl, CURLOPT_TIMEOUT, 20);
         curl_setopt($curl, CURLOPT_ENCODING, 'gzip');
         curl_setopt($curl, CURLOPT_IPRESOLVE, 1);
@@ -101,16 +107,7 @@ class Meting
         curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
         curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_COOKIE, $this->cookie);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
-            'Accept: */*',
-            'Accept-Encoding: gzip, deflate',
-            'Accept-Language: zh-CN,zh;q=0.8,gl;q=0.6,zh-TW;q=0.4',
-            'Connection: keep-alive',
-            'Content-Type: application/x-www-form-urlencoded',
-            'Referer: '.$this->referer,
-            'User-Agent: '.$this->useragent,
-        ));
+        curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
         for ($i = 0; $i < 3; $i++) {
             $this->raw = curl_exec($curl);
             $this->info = curl_getinfo($curl);
@@ -771,33 +768,33 @@ class Meting
         switch ($this->server) {
             case 'netease':
             return array(
-                'referer'   => 'https://music.163.com/',
-                'cookie'    => 'os=pc; osver=Microsoft-Windows-10-Professional-build-10586-64bit; appver=2.0.3.131777; channel=netease; __remember_me=true',
-                'useragent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
+                'Referer'    => 'https://music.163.com/',
+                'Cookie'     => 'os=pc; osver=Microsoft-Windows-10-Professional-build-10586-64bit; appver=2.0.3.131777; channel=netease; __remember_me=true',
+                'User-Agent' => 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36',
+                'X-Real-IP'  => long2ip(mt_rand(1884815360, 1884890111)),
             );
             case 'tencent':
             return array(
-                'referer'   => 'https://y.qq.com/portal/player.html',
-                'cookie'    => 'pgv_pvi=22038528; pgv_si=s3156287488; pgv_pvid=5535248600; yplayer_open=1; ts_last=y.qq.com/portal/player.html; ts_uid=4847550686; yq_index=0; qqmusic_fromtag=66; player_exist=1',
-                'useragent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36',
+                'Referer'    => 'https://y.qq.com/portal/player.html',
+                'Cookie'     => 'pgv_pvi=22038528; pgv_si=s3156287488; pgv_pvid=5535248600; yplayer_open=1; ts_last=y.qq.com/portal/player.html; ts_uid=4847550686; yq_index=0; qqmusic_fromtag=66; player_exist=1',
+                'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36',
             );
             case 'xiami':
             return array(
-                'referer'   => 'http://h5api.m.xiami.com/',
-                'cookie'    => '_m_h5_tk=15d3402511a022796d88b249f83fb968_1511163656929; _m_h5_tk_enc=b6b3e64d81dae577fc314b5c5692df3c',
-                'useragent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) XIAMI-MUSIC/3.0.9 Chrome/56.0.2924.87 Electron/1.6.11 Safari/537.36',
+                'Referer'    => 'http://h5api.m.xiami.com/',
+                'Cookie'     => '_m_h5_tk=15d3402511a022796d88b249f83fb968_1511163656929; _m_h5_tk_enc=b6b3e64d81dae577fc314b5c5692df3c',
+                'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_1) AppleWebKit/537.36 (KHTML, like Gecko) XIAMI-MUSIC/3.0.9 Chrome/56.0.2924.87 Electron/1.6.11 Safari/537.36',
             );
             case 'kugou':
             return array(
-                'referer'   => 'http://www.kugou.com/webkugouplayer/flash/webKugou.swf',
-                'cookie'    => 'kg_mid='.$this->getRandomHex(32),
-                'useragent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36',
+                'Referer'    => 'http://www.kugou.com/webkugouplayer/flash/webKugou.swf',
+                'Cookie'     => 'kg_mid='.$this->getRandomHex(32),
+                'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.140 Safari/537.36',
             );
             case 'baidu':
             return array(
-                'referer'   => '',
-                'cookie'    => 'BAIDUID='.$this->getRandomHex(32).':FG=1',
-                'useragent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) baidu-music/1.0.2 Chrome/56.0.2924.87 Electron/1.6.11 Safari/537.36',
+                'Cookie'     => 'BAIDUID='.$this->getRandomHex(32).':FG=1',
+                'User-Agent' => 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_3) AppleWebKit/537.36 (KHTML, like Gecko) baidu-music/1.0.2 Chrome/56.0.2924.87 Electron/1.6.11 Safari/537.36',
             );
         }
     }
@@ -852,17 +849,34 @@ class Meting
         $pubkey = '65537';
         $nonce = '0CoJUm6Qyw8W8jud';
         $vi = '0102030405060708';
-        $skey = $this->getRandomHex(16);
+
+        if (extension_loaded('bcmath')) {
+            $skey = $this->getRandomHex(16);
+        } else {
+            $skey = 'B3v3kH4vRPWRJFfH';
+        }
 
         $body = json_encode($api['body']);
-        $body = openssl_encrypt($body, 'aes-128-cbc', $nonce, false, $vi);
-        $body = openssl_encrypt($body, 'aes-128-cbc', $skey, false, $vi);
 
-        $skey = strrev(utf8_encode($skey));
-        $skey = $this->bchexdec($this->str2hex($skey));
-        $skey = bcpowmod($skey, $pubkey, $modulus);
-        $skey = $this->bcdechex($skey);
-        $skey = str_pad($skey, 256, '0', STR_PAD_LEFT);
+        if (function_exists('openssl_encrypt')) {
+            $body = openssl_encrypt($body, 'aes-128-cbc', $nonce, false, $vi);
+            $body = openssl_encrypt($body, 'aes-128-cbc', $skey, false, $vi);
+        } else {
+            $pad = 16 - (strlen($body) % 16);
+            $body = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $nonce, $body.str_repeat(chr($pad), $pad), MCRYPT_MODE_CBC, $vi));
+            $pad = 16 - (strlen($body) % 16);
+            $body = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $skey, $body.str_repeat(chr($pad), $pad), MCRYPT_MODE_CBC, $vi));
+        }
+
+        if (extension_loaded('bcmath')) {
+            $skey = strrev(utf8_encode($skey));
+            $skey = $this->bchexdec($this->str2hex($skey));
+            $skey = bcpowmod($skey, $pubkey, $modulus);
+            $skey = $this->bcdechex($skey);
+            $skey = str_pad($skey, 256, '0', STR_PAD_LEFT);
+        } else {
+            $skey = '85302b818aea19b68db899c25dac229412d9bba9b3fcfe4f714dc016bc1686fc446a08844b1f8327fd9cb623cc189be00c5a365ac835e93d4858ee66f43fdc59e32aaed3ef24f0675d70172ef688d376a4807228c55583fe5bac647d10ecef15220feef61477c28cae8406f6f9896ed329d6db9f88757e31848a6c2ce2f94308';
+        }
 
         $api['url'] = str_replace('/api/', '/weapi/', $api['url']);
         $api['body'] = array(
@@ -883,8 +897,8 @@ class Meting
         if (function_exists('openssl_encrypt')) {
             $data = openssl_encrypt($data, 'aes-128-cbc', $key, false, $vi);
         } else {
-            $PAD = 16 - (strlen($data) % 16);
-            $data = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $data.str_repeat(chr($PAD), $PAD), MCRYPT_MODE_CBC, $vi));
+            $pad = 16 - (strlen($data) % 16);
+            $data = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $data.str_repeat(chr($pad), $pad), MCRYPT_MODE_CBC, $vi));
         }
 
         $api['body']['e'] = $data;
@@ -896,7 +910,7 @@ class Meting
     {
         $data = $this->curl('http://h5api.m.xiami.com/h5/mtop.alimusic.search.searchservice.searchsongs/1.0/?appKey=12574478&t=1511168684000&dataType=json&data=%7B%22requestStr%22%3A%22%7B%5C%22model%5C%22%3A%7B%5C%22key%5C%22%3A%5C%22Dangerous+Woman%5C%22%2C%5C%22pagingVO%5C%22%3A%7B%5C%22page%5C%22%3A1%2C%5C%22pageSize%5C%22%3A30%7D%7D%7D%22%7D&api=mtop.alimusic.search.searchservice.searchsongs&v=1.0&type=originaljson&sign=f6c99a429e9ef703ea955f7cd113a467', null, 1);
         preg_match_all('/_m_h5[^;]+/', $data->raw, $match);
-        $this->cookie = $match[0][0].'; '.$match[0][1];
+        $this->header['Cookie'] = $match[0][0].'; '.$match[0][1];
         $data = json_encode(array(
             'requestStr' => json_encode(array(
                 'header' => array(
@@ -906,7 +920,7 @@ class Meting
             )),
         ));
         $appkey = '12574478';
-        $cookie = $this->cookie;
+        $cookie = $this->header['Cookie'];
         preg_match('/_m_h5_tk=([^_]+)/', $cookie, $match);
         $token = $match[1];
         $t = time() * 1000;

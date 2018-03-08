@@ -54,4 +54,13 @@ CREATE TABLE `%dbname%` (
     {
         return $this->db->query($this->db->delete('table.metingcache'));
     }
+    public function check()
+    {
+        $number = uniqid();
+        $this->set('check', $number, 60);
+        $cache = $this->get('check');
+        if ($number != $cache) {
+            throw new Exception('Cache Test Fall!');
+        }
+    }
 }

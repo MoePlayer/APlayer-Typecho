@@ -8,13 +8,13 @@ if (!defined('__TYPECHO_ROOT_DIR__')) {
  *
  * @package APlayer for Typecho | Meting
  * @author METO
- * @version 2.1.0
+ * @version 2.1.1
  * @dependence 14.10.10-*
  * @link https://github.com/MoePlayer/APlayer-Typecho
  *
  */
 
-define('METING_VERSION', '2.1.0');
+define('METING_VERSION', '2.1.1');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -103,7 +103,8 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $list = array(
             'none' => _t('关闭'),
             'redis' => _t('Redis'),
-            'mysql' => _t('Mysql'),
+            'memcached' => _t('Memcached'),
+            'mysql' => _t('MySQL'),
             'sqlite' => _t('SQLite')
         );
         $t = new Typecho_Widget_Helper_Form_Element_Radio(
@@ -187,6 +188,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
                         'port' => $config['cacheport']
                     ));
                     $cache->install();
+                    $cache->check();
                     $cache->flush();
                 } catch (Exception $e) {
                     throw new Typecho_Plugin_Exception(_t($e->getMessage()));
