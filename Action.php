@@ -71,11 +71,11 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do
         }
 
         // auth 验证
-        $EID = $server.'/'.$type.'/'.$id;
+        $EID = $server.$type.$id;
         $salt = Typecho_Widget::widget('Widget_Options')->plugin('Meting')->salt;
 
-        if (!empty($salt) && in_array($type, array('lrc','pic','url'))) {
-            $auth1 = md5($salt.$type.$id.$salt);
+        if (!empty($salt)) {
+            $auth1 = md5($salt.$EID.$salt);
             $auth2 = $this->request->get('auth');
             if (strcmp($auth1, $auth2)) {
                 http_response_code(403);
@@ -129,6 +129,10 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do
                 $url = str_replace('http://m10.', 'https://m10.', $url);
             }
 
+            if ($server == 'xiami') {
+                $url = str_replace('http://', 'https://', $url);
+            }
+
             if ($server == 'baidu') {
                 $url = str_replace('http://zhangmenshiting.qianqian.com', 'https://gss3.baidu.com/y0s1hSulBw92lNKgpU_Z2jR7b2w6buu', $url);
             }
@@ -155,11 +159,11 @@ class Meting_Action extends Typecho_Widget implements Widget_Interface_Do
             $music = array();
             foreach ($data as $vo) {
                 $music[] = array(
-                    'title' => $vo['name'],
-                    'author' => implode(' / ', $vo['artist']),
-                    'url' => $url.'?server='.$vo['source'].'&type=url&id='.$vo['url_id'].'&auth='.md5($salt.'url'.$vo['url_id'].$salt),
-                    'pic' => $url.'?server='.$vo['source'].'&type=pic&id='.$vo['pic_id'].'&auth='.md5($salt.'pic'.$vo['pic_id'].$salt),
-                    'lrc' => $url.'?server='.$vo['source'].'&type=lrc&id='.$vo['lyric_id'].'&auth='.md5($salt.'lrc'.$vo['lyric_id'].$salt),
+                    'name'   => $vo['name'],
+                    'artist' => implode(' / ', $vo['artist']),
+                    'url'    => $url.'?server='.$vo['source'].'&type=url&id='.$vo['url_id'].'&auth='.md5($salt.$vo['source'].'url'.$vo['url_id'].$salt),
+                    'cover'  => $url.'?server='.$vo['source'].'&type=pic&id='.$vo['pic_id'].'&auth='.md5($salt.$vo['source'].'pic'.$vo['pic_id'].$salt),
+                    'lrc'    => $url.'?server='.$vo['source'].'&type=lrc&id='.$vo['lyric_id'].'&auth='.md5($salt.$vo['source'].'lrc'.$vo['lyric_id'].$salt),
                 );
             }
             header("Content-Type: application/javascript");

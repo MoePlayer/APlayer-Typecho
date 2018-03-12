@@ -8,13 +8,13 @@ if (!defined('__TYPECHO_ROOT_DIR__')) {
  *
  * @package APlayer for Typecho | Meting
  * @author METO
- * @version 2.1.1
+ * @version 2.1.2
  * @dependence 14.10.10-*
  * @link https://github.com/MoePlayer/APlayer-Typecho
  *
  */
 
-define('METING_VERSION', '2.1.1');
+define('METING_VERSION', '2.1.2');
 
 class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
 {
@@ -84,9 +84,9 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         );
         $form->addInput($t);
         $t = new Typecho_Widget_Helper_Form_Element_Radio(
-            'mode',
-            array('circulation' => _t('循环'),'single' => _t('单曲'),'order' => _t('列表'),'random' => _t('随机')),
-            'circulation',
+            'order',
+            array('list' => _t('列表'), 'random' => _t('随机')),
+            'list',
             _t('全局播放模式'),
             _t('')
         );
@@ -143,7 +143,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $t = new Typecho_Widget_Helper_Form_Element_Text(
             'api',
             null,
-            Typecho_Common::url('action/metingapi', Helper::options()->index)."?server=:server&type=:type&id=:id&r=:r",
+            Typecho_Common::url('action/metingapi', Helper::options()->index)."?server=:server&type=:type&id=:id&auth=:auth&r=:r",
             _t('* 云解析地址'),
             _t('示例：https://api.i-meto.com/meting/api?server=:server&type=:type&id=:id&r=:r')
         );
@@ -177,7 +177,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
     {
         if (!$is_init) {
             if (empty($config['api'])) {
-                $config['api'] = Typecho_Common::url('action/metingapi', Helper::options()->index)."?server=:server&type=:type&id=:id&r=:r";
+                $config['api'] = Typecho_Common::url('action/metingapi', Helper::options()->index)."?server=:server&type=:type&id=:id&auth=:auth&r=:r";
             }
             if ($config['cachetype'] != 'none') {
                 require_once 'driver/cache.interface.php';
@@ -215,6 +215,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
         $api = Typecho_Widget::widget('Widget_Options')->plugin('Meting')->api;
         $dir = Helper::options()->pluginUrl.'/Meting/assets';
         $ver = METING_VERSION;
+        echo "<link rel=\"stylesheet\" href=\"{$dir}/APlayer.min.css?v={$ver}\">\n";
         echo "<script type=\"text/javascript\" src=\"{$dir}/APlayer.min.js?v={$ver}\"></script>\n";
         echo "<script>var meting_api=\"{$api}\";</script>";
     }
@@ -258,8 +259,8 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
                 'theme' => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->theme?:'red',
                 'preload' => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->preload?:'auto',
                 'autoplay' => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->autoplay?:'false',
-                'listmaxheight' => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->height?:'340px',
-                'mode' => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->mode?:'circulation',
+                'listMaxHeight' => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->height?:'340px',
+                'order' => Typecho_Widget::widget('Widget_Options')->plugin('Meting')->order?:'list',
             );
             if (isset($t['server'])) {
                 if (!in_array($t['server'], array('netease','tencent','xiami','baidu','kugou'))) {
@@ -270,7 +271,10 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
                 }
                 $data = $t;
 
-                $str .= "<div class=\"aplayer\" data-id=\"{$data['id']}\" data-server=\"{$data['server']}\" data-type=\"{$data['type']}\"";
+                $salt = Typecho_Widget::widget('Widget_Options')->plugin('Meting')->salt;
+                $auth = md5($salt.$data['server'].$data['type'].$data['id'].$salt);
+
+                $str .= "<div class=\"aplayer\" data-id=\"{$data['id']}\" data-server=\"{$data['server']}\" data-type=\"{$data['type']}\" data-auth=\"{$auth}\"";
                 if (is_array($setting)) {
                     foreach ($setting as $key => $vo) {
                         $player[$key] = $vo;
@@ -283,7 +287,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
             } else {
                 $data = $t;
 
-                $str .= "<div class=\"aplayer\" data-title=\"{$data['title']}\" data-author=\"{$data['author']}\" data-url=\"{$data['url']}\" data-pic=\"{$data['pic']}\" data-lrc=\"{$data['lrc']}\"";
+                $str .= "<div class=\"aplayer\" data-name=\"{$data['title']}\" data-artist=\"{$data['author']}\" data-url=\"{$data['url']}\" data-cover=\"{$data['pic']}\" data-lrc=\"{$data['lrc']}\"";
                 if (is_array($setting)) {
                     foreach ($setting as $key => $vo) {
                         $player[$key] = $vo;
