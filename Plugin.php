@@ -105,7 +105,8 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
             'redis' => _t('Redis'),
             'memcached' => _t('Memcached'),
             'mysql' => _t('MySQL'),
-            'sqlite' => _t('SQLite')
+            'sqlite' => _t('SQLite'),
+            'postgres' => _t('PostgreSQL')
         );
         $t = new Typecho_Widget_Helper_Form_Element_Radio(
             'cachetype',
@@ -128,7 +129,7 @@ class Meting_Plugin extends Typecho_Widget implements Typecho_Plugin_Interface
             null,
             '6379',
             _t('缓存服务端口'),
-            _t('默认端口 memcache: 11211, Redis: 6379, Mysql: 3306')
+            _t('默认端口 memcache: 11211, Redis: 6379, Mysql: 3306, PostgreSQL: 5432')
         );
         $form->addInput($t);
 
